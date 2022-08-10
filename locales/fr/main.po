@@ -1,0 +1,62 @@
+msgid "A bayesian filter"
+msgstr "Un filtre bayésien"
+
+msgid "Filtered by %s, actual spamminess: %s %%"
+msgstr "Filtré par %s, spamitude actuelle : %s %%"
+
+msgid "Cleanup successful."
+msgstr "Nettoyage réussi."
+
+msgid "Old messages were learned successfully."
+msgstr "L'apprentissage des anciens messages a été réalisé avec succès."
+
+msgid "Reset successful."
+msgstr "Réinitialisation réussie."
+
+msgid "Statistics"
+msgstr "Statistiques"
+
+msgid "Learned comments:"
+msgstr "Nombre de commentaires appris :"
+
+msgid "Total comments:"
+msgstr "Nombre total de commentaires :"
+
+msgid "Learned tokens:"
+msgstr "Nombre de tokens appris :"
+
+msgid "Accuracy:"
+msgstr "Efficacité :"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "Initialization"
+msgstr "Initialisation"
+
+msgid "Learn from old messages"
+msgstr "Apprentissage des anciens messages"
+
+msgid "Maintenance"
+msgstr "Entretien"
+
+msgid "Cleanup"
+msgstr "Nettoyage"
+
+msgid "Reset filter"
+msgstr "Réinitialiser le filtre"
+
+msgid "Delete all learned data"
+msgstr "Supprimer toutes les données apprises"
+
+msgid "Are you sure?"
+msgstr "Etes-vous sûrs?"
+
+msgid "Time remaining:"
+msgstr "Temps restant :"
+
+msgid "Progress:"
+msgstr "Progression :"
+
+msgid "Learning in progress..."
+msgstr "Apprentissage en cours..."
