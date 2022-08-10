@@ -45,9 +45,9 @@ class dcFilterSpample2 extends dcSpamFilter
     public function getStatusMessage($status, $comment_id)
     {
         $p          = 0;
-        $con        = $this->core->con;
-        $spamFilter = new bayesian($this->core);
-        $rs         = $con->select('SELECT comment_author, comment_email, comment_site, comment_ip, comment_content FROM ' . $this->core->blog->prefix . 'comment WHERE comment_id = ' . $comment_id);
+        $con        = dcCore::app()->con;
+        $spamFilter = new bayesian(dcCore::app());
+        $rs         = $con->select('SELECT comment_author, comment_email, comment_site, comment_ip, comment_content FROM ' . dcCore::app()->blog->prefix . 'comment WHERE comment_id = ' . $comment_id);
         $rs->fetch();
         $p = $spamFilter->getMsgProba($rs->comment_author, $rs->comment_email, $rs->comment_site, $rs->comment_ip, $rs->comment_content);
         $p = round($p * 100);
@@ -81,7 +81,7 @@ class dcFilterSpample2 extends dcSpamFilter
         $post_id,
         &$status
     ) {
-        $spamFilter = new bayesian($this->core);
+        $spamFilter = new bayesian(dcCore::app());
 
         $spam = $spamFilter->handle_new_message($author, $email, $site, $ip, $content);
 
@@ -117,9 +117,9 @@ class dcFilterSpample2 extends dcSpamFilter
         $content,
         $rs
     ) {
-        $spamFilter = new bayesian($this->core);
+        $spamFilter = new bayesian(dcCore::app());
 
-        $rs2 = $this->core->con->select('SELECT comment_bayes, comment_bayes_err FROM ' . $this->core->blog->prefix . 'comment WHERE comment_id = ' . $rs->comment_id);
+        $rs2 = dcCore::app()->con->select('SELECT comment_bayes, comment_bayes_err FROM ' . dcCore::app()->blog->prefix . 'comment WHERE comment_id = ' . $rs->comment_id);
         $rs2->fetch();
 
         $spam = 0;
@@ -129,13 +129,13 @@ class dcFilterSpample2 extends dcSpamFilter
 
         if ($rs2->comment_bayes == 0) {
             $spamFilter->train($author, $email, $site, $ip, $content, $spam);
-            $req = 'UPDATE ' . $this->core->blog->prefix . 'comment SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
-            $this->core->con->execute($req);
+            $req = 'UPDATE ' . dcCore::app()->blog->prefix . 'comment SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
+            dcCore::app()->con->execute($req);
         } else {
             $spamFilter->retrain($author, $email, $site, $ip, $content, $spam);
             $err = $rs2->comment_bayes_err ? 0 : 1;
-            $req = 'UPDATE ' . $this->core->blog->prefix . 'comment SET comment_bayes_err = ' . $err . ' WHERE comment_id = ' . $rs->comment_id;
-            $this->core->con->execute($req);
+            $req = 'UPDATE ' . dcCore::app()->blog->prefix . 'comment SET comment_bayes_err = ' . $err . ' WHERE comment_id = ' . $rs->comment_id;
+            dcCore::app()->con->execute($req);
         }
     }
 
@@ -148,13 +148,13 @@ class dcFilterSpample2 extends dcSpamFilter
     public function gui($url)
     {
         $content    = '';
-        $spamFilter = new bayesian($this->core);
+        $spamFilter = new bayesian(dcCore::app());
 
         $action = !empty($_POST['action']) ? $_POST['action'] : null;
 
         # count nr of comments
         $nb_comm = 0;
-        $req     = 'SELECT COUNT(comment_id) FROM ' . $this->core->blog->prefix . 'comment';
+        $req     = 'SELECT COUNT(comment_id) FROM ' . dcCore::app()->blog->prefix . 'comment';
         $rs      = dcCore::app()->con->select($req);
         if ($rs->fetch()) {
             $nb_comm = $rs->f(0);
@@ -174,9 +174,9 @@ class dcFilterSpample2 extends dcSpamFilter
             $pos        = $spamFilter->getNumLearnedComments();
             $stop       = $nb_comm;
             $inc        = 10;
-            $params     = [$this->core, $spamFilter];
+            $params     = [dcCore::app(), $spamFilter];
             $title      = __('Learning in progress...');
-            $progress   = new progress($title, $urlprefix, $urlreturn, $func, $start, $stop, $inc, $this->core->getNonce(), $pos, $formparams);
+            $progress   = new progress($title, $urlprefix, $urlreturn, $func, $start, $stop, $inc, dcCore::app()->getNonce(), $pos, $formparams);
             $content    = $progress->gui($content);
 
             return $content;
@@ -205,7 +205,7 @@ class dcFilterSpample2 extends dcSpamFilter
                     '<form action="plugin.php?p=antispam&amp;f=dcFilterSpample2" method="post">' .
                     '<p><input type="submit" value="' . __('Learn from old messages') . '" ' . (($learned == $nb_comm) ? 'disabled="true"' : '') . '/> ' .
                     form::hidden(['action'], 'oldmsg') .
-                    $this->core->formNonce() .
+                    dcCore::app()->formNonce() .
                     '</p>' .
                     '</form>';
 
@@ -213,7 +213,7 @@ class dcFilterSpample2 extends dcSpamFilter
                     '<form action="plugin.php?p=antispam&amp;f=dcFilterSpample2" method="post">' .
                     '<p><input type="submit" value="' . __('Cleanup') . '" /> ' .
                     form::hidden(['action'], 'cleanup') .
-                    $this->core->formNonce() .
+                    dcCore::app()->formNonce() .
                     '</p>' .
                     '</form>';
 
@@ -221,7 +221,7 @@ class dcFilterSpample2 extends dcSpamFilter
                     '<form action="plugin.php?p=antispam&amp;f=dcFilterSpample2" method="post">' .
                     '<p><input type="submit" onclick="return(confirm(\'' . __('Are you sure?') . '\'));" value="' . __('Delete all learned data') . '" /> ' .
                     form::hidden(['action'], 'reset') .
-                    $this->core->formNonce() .
+                    dcCore::app()->formNonce() .
                     '</p>' .
                     '</form>';
 

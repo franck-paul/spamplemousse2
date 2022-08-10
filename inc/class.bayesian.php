@@ -19,7 +19,6 @@ This class implements all the bayesian filtering logic.
  */
 class bayesian
 {
-    private $core;
     private $con;
     private $table;
     private $val_hapax;
@@ -35,11 +34,10 @@ class bayesian
 
     @param	core		<b>dcCore</b>		Dotclear core object
      */
-    public function __construct($core)
+    public function __construct($core = null)
     {
-        $this->core  = & $core;
-        $this->con   = & $core->con;
-        $this->table = $core->prefix . 'spam_token';
+        $this->con   = dcCore::app()->con;
+        $this->table = dcCore::app()->prefix . 'spam_token';
 
         # all parameters
         $this->val_hapax     = 0.45; # hapaxial value
@@ -86,8 +84,7 @@ class bayesian
         $site,
         $ip,
         $content
-    )
-    {
+    ) {
         $spam = 0;
         $tok  = $this->tokenize(
             $author,
@@ -187,8 +184,7 @@ class bayesian
         $site,
         $ip,
         $content
-    )
-    {
+    ) {
         $tok = $this->tokenize(
             $author,
             $email,
@@ -238,8 +234,7 @@ class bayesian
         $m_site,
         $m_ip,
         $m_content
-    )
-    {
+    ) {
         $url_t   = new url_tokenizer();
         $email_t = new email_tokenizer();
         $ip_t    = new ip_tokenizer();
@@ -500,7 +495,7 @@ class bayesian
         }
 
         $a = ($nspam / $total_spam);
-        $b = ($nham / $total_ham);
+        $b = ($nham  / $total_ham);
         if ($this->bias) {
             $b = 2 * $b;
         }
@@ -574,14 +569,12 @@ class bayesian
      */
     public static function feedCorpus($limit, $offset)
     {
-        $core = &$GLOBALS['core'];
         if (!isset($GLOBALS['bayes'])) {
-            $GLOBALS['bayes'] = new bayesian($core);
+            $GLOBALS['bayes'] = new bayesian(dcCore::app());
         }
         $bayes = &$GLOBALS['bayes'];
-        $con   = &$core->con;
 
-        $rs = $con->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . $core->blog->prefix . 'comment ORDER BY comment_id LIMIT ' . $limit . ' OFFSET ' . $offset);
+        $rs = dcCore::app()->con->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . dcCore::app()->blog->prefix . 'comment ORDER BY comment_id LIMIT ' . $limit . ' OFFSET ' . $offset);
 
         while ($rs->fetch()) {
             if ($rs->comment_bayes == 0) {
@@ -590,8 +583,8 @@ class bayesian
                     $spam = 1;
                 }
                 $bayes->train($rs->comment_author, $rs->comment_email, $rs->comment_site, $rs->comment_ip, $rs->comment_content, $spam);
-                $req = 'UPDATE ' . $core->blog->prefix . 'comment SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
-                $con->execute($req);
+                $req = 'UPDATE ' . dcCore::app()->blog->prefix . 'comment SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
+                dcCore::app()->con->execute($req);
             }
         }
     }
@@ -607,16 +600,16 @@ class bayesian
         }
         # delete data stale for 6 months
         $req = 'DELETE FROM ' . $this->table . ' WHERE (NOW() - INTERVAL ' . $delim . '6 MONTH' . $delim . ') > token_mdate';
-        $this->core->con->execute($req);
+        dcCore::app()->con->execute($req);
 
         # delete all hapaxes stale for 15 days
         $req = 'DELETE FROM ' . $this->table . ' WHERE  (token_nham +2 * token_nspam ) < 5 AND (NOW() - INTERVAL ' . $delim . '15 DAY' . $delim . ') > token_mdate';
-        $this->core->con->execute($req);
+        dcCore::app()->con->execute($req);
 
         # if in TUM mode, delete all matured data between 0.3 and 0.7
         if ($this->training_mode == 'TUM') {
             $req = 'DELETE FROM ' . $this->table . ' WHERE token_p > 0.3 AND token_p < 0.7 AND token_mature = 1';
-            $this->core->con->execute($req);
+            dcCore::app()->con->execute($req);
         }
     }
 
@@ -625,10 +618,10 @@ class bayesian
      */
     public function resetFilter()
     {
-        $req = 'UPDATE ' . $this->core->blog->prefix . 'comment SET comment_bayes = 0, comment_bayes_err = 0';
-        $this->core->con->execute($req);
+        $req = 'UPDATE ' . dcCore::app()->blog->prefix . 'comment SET comment_bayes = 0, comment_bayes_err = 0';
+        dcCore::app()->con->execute($req);
         $req = 'DELETE FROM ' . $this->table;
-        $this->core->con->execute($req);
+        dcCore::app()->con->execute($req);
     }
 
     /**
@@ -639,7 +632,7 @@ class bayesian
     public function getNumLearnedComments()
     {
         $result = 0;
-        $req    = 'SELECT COUNT(comment_id) FROM ' . $this->core->blog->prefix . 'comment WHERE comment_bayes = 1';
+        $req    = 'SELECT COUNT(comment_id) FROM ' . dcCore::app()->blog->prefix . 'comment WHERE comment_bayes = 1';
         $rs     = $this->con->select($req);
         if ($rs->fetch()) {
             $result = $rs->f(0);
@@ -656,7 +649,7 @@ class bayesian
     public function getNumErrorComments()
     {
         $result = 0;
-        $req    = 'SELECT COUNT(comment_id) FROM ' . $this->core->blog->prefix . 'comment WHERE comment_bayes_err = 1';
+        $req    = 'SELECT COUNT(comment_id) FROM ' . dcCore::app()->blog->prefix . 'comment WHERE comment_bayes_err = 1';
         $rs     = $this->con->select($req);
         if ($rs->fetch()) {
             $result = $rs->f(0);
