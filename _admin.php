@@ -29,7 +29,7 @@ class progressRest
     @param	post		<b>array</b>		Post parameters
     @return				<b>XmlTag</b>		XML message
      */
-    public static function postProgress($core = null, $get, $post)
+    public static function postProgress($core, $get, $post)
     {
         $title      = '';
         $urlprefix  = '';
