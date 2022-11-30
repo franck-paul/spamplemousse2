@@ -11,8 +11,6 @@
 #
 # -- END LICENSE BLOCK ------------------------------------
 
-dcCore::app()->rest->addFunction('postProgress', ['progressRest','postProgress']);
-
 /**
 @ingroup PROGRESS
 @brief Progress rest interface
@@ -42,8 +40,9 @@ class progressRest
         $baseInc    = !empty($post['baseInc']) ? $post['baseInc'] : 0;
 
         $progress = new progress($title, $urlprefix, $urlreturn, $func, $start, $stop, $baseInc, dcCore::app()->getNonce());
-        $content  = $progress->toXml();
 
-        return $content;
+        return $progress->toXml();
     }
 }
+
+dcCore::app()->rest->addFunction('postProgress', [progressRest::class, 'postProgress']);

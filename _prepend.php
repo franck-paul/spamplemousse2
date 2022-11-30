@@ -11,16 +11,16 @@
 #
 # -- END LICENSE BLOCK ------------------------------------
 
-global $__autoload;
-
-$__autoload['bayesian']               = __DIR__ . '/inc/class.bayesian.php';
-$__autoload['tokenizer']              = __DIR__ . '/tokenizers/class.tokenizer.php';
-$__autoload['url_tokenizer']          = __DIR__ . '/tokenizers/class.url_tokenizer.php';
-$__autoload['email_tokenizer']        = __DIR__ . '/tokenizers/class.email_tokenizer.php';
-$__autoload['ip_tokenizer']           = __DIR__ . '/tokenizers/class.ip_tokenizer.php';
-$__autoload['redundancies_tokenizer'] = __DIR__ . '/tokenizers/class.redundancies_tokenizer.php';
-$__autoload['reassembly_tokenizer']   = __DIR__ . '/tokenizers/class.reassembly_tokenizer.php';
-$__autoload['dcFilterSpample2']       = __DIR__ . '/inc/class.dc.filter.spample2.php';
-$__autoload['progress']               = __DIR__ . '/inc/class.progress.php';
+Clearbricks::lib()->autoload([
+    'bayesian'               => __DIR__ . '/inc/class.bayesian.php',
+    'tokenizer'              => __DIR__ . '/tokenizers/class.tokenizer.php',
+    'url_tokenizer'          => __DIR__ . '/tokenizers/class.url_tokenizer.php',
+    'email_tokenizer'        => __DIR__ . '/tokenizers/class.email_tokenizer.php',
+    'ip_tokenizer'           => __DIR__ . '/tokenizers/class.ip_tokenizer.php',
+    'redundancies_tokenizer' => __DIR__ . '/tokenizers/class.redundancies_tokenizer.php',
+    'reassembly_tokenizer'   => __DIR__ . '/tokenizers/class.reassembly_tokenizer.php',
+    'dcFilterSpample2'       => __DIR__ . '/inc/class.dc.filter.spample2.php',
+    'progress'               => __DIR__ . '/inc/class.progress.php',
+]);
 
 dcCore::app()->spamfilters[] = 'dcFilterSpample2';

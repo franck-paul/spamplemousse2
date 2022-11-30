@@ -22,7 +22,7 @@ $i_version = dcCore::app()->getVersion($label);
 
 # If the version in the version table is greater than
 # the one of this module, -> do nothing
-if (version_compare($i_version, $m_version, '>=')) {
+if (version_compare((string) $i_version, $m_version, '>=')) {
     return;
 }
 

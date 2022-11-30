@@ -11,5 +11,5 @@
 #
 # -- END LICENSE BLOCK ------------------------------------
 
-dcCore::app()->addBehavior('publicAfterCommentCreate', ['dcFilterSpample2','toggleLearnedFlag']);
-dcCore::app()->addBehavior('publicAfterTrackbackCreate', ['dcFilterSpample2','toggleLearnedFlag']);
+dcCore::app()->addBehavior('publicAfterCommentCreate', [dcFilterSpample2::class,'toggleLearnedFlag']);
+dcCore::app()->addBehavior('publicAfterTrackbackCreate', [dcFilterSpample2::class,'toggleLearnedFlag']);

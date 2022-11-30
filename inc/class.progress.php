@@ -100,7 +100,7 @@ class progress
             try {
                 $this->compute();
             } catch (Exception $e) {
-                $error = $e->toString();
+                $error = $e->getMessage();
             }
         }
 

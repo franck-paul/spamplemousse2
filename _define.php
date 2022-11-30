@@ -16,18 +16,21 @@ if (!defined('DC_RC_PATH')) {
 }
 
 $this->registerModule(
-    'Spamplemousse2',                       // Name
-    'A bayesian spam filter for dotclear',  // Description
-    'Alain Vagner and contributors',        // Author
-    '2.1',
+    'Spamplemousse2',
+    'A bayesian spam filter for dotclear',
+    'Alain Vagner and contributors',
+    '3.0',
     [
-        'requires'    => [['core', '2.23']],    // Dependencies
-        'type'        => 'plugin',              // Type
-        'priority'    => 100,                   // Priority
-        'permissions' => 'usage,contentadmin',  // Permissions
+        'requires'    => [['core', '2.24']],
+        'type'        => 'plugin',
+        'priority'    => 100,
+        'permissions' => dcCore::app()->auth->makePermissions([
+            dcAuth::PERMISSION_USAGE,
+            dcAuth::PERMISSION_CONTENT_ADMIN,
+        ]),
 
-        'details'    => 'https://open-time.net/?q=spamplemousse2',       // Details URL
-        'support'    => 'https://github.com/franck-paul/spamplemousse2', // Support URL
+        'details'    => 'https://open-time.net/?q=spamplemousse2',
+        'support'    => 'https://github.com/franck-paul/spamplemousse2',
         'repository' => 'https://raw.githubusercontent.com/franck-paul/spamplemousse2/main/dcstore.xml',
     ]
 );
