@@ -107,7 +107,7 @@ class progress
         if ($error != '') {
             $content .= '<p class="message">' . __('Error:') . ' ' . $error . '</p>';
         } else {
-            $content .= '<script type="text/javascript" src="index.php?pf=spamplemousse2/progress.js"></script>';
+            $content .= '<script type="text/javascript" src="index.php?pf=spamplemousse2/js/progress.js"></script>';
 
             // display informations
             $content .= '<p>' . __('Progress:') . ' <span id="percent">' . sprintf('%d', $this->percent) . '</span> %</p>';
