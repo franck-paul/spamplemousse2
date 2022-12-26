@@ -10,19 +10,11 @@
 # http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 #
 # -- END LICENSE BLOCK ------------------------------------
+if (!defined('DC_CONTEXT_ADMIN')) {
+    return;
+}
 
-#plugin label
-$label = 'spamplemousse2';
-
-# We read the plugin version
-$m_version = dcCore::app()->plugins->moduleInfo($label, 'version');
-
-# We read the plugin version in the version table
-$i_version = dcCore::app()->getVersion($label);
-
-# If the version in the version table is greater than
-# the one of this module, -> do nothing
-if (version_compare((string) $i_version, $m_version, '>=')) {
+if (!dcCore::app()->newVersion(basename(__DIR__), dcCore::app()->plugins->moduleInfo(basename(__DIR__), 'version'))) {
     return;
 }
 
@@ -48,7 +40,5 @@ $s->comment
 # schema sync
 $si = new dbStruct(dcCore::app()->con, dcCore::app()->prefix);
 $si->synchronize($s);
-
-dcCore::app()->setVersion($label, $m_version);
 
 return true;

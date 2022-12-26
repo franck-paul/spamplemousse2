@@ -19,7 +19,7 @@ $this->registerModule(
     'Spamplemousse2',
     'A bayesian spam filter for dotclear',
     'Alain Vagner and contributors',
-    '3.0',
+    '3.1',
     [
         'requires'    => [['core', '2.24']],
         'type'        => 'plugin',
@@ -29,8 +29,8 @@ $this->registerModule(
             dcAuth::PERMISSION_CONTENT_ADMIN,
         ]),
 
-        'details'    => 'https://open-time.net/?q=spamplemousse2',
-        'support'    => 'https://github.com/franck-paul/spamplemousse2',
-        'repository' => 'https://raw.githubusercontent.com/franck-paul/spamplemousse2/main/dcstore.xml',
+        'details'     => 'https://open-time.net/?q=spamplemousse2',
+        'support'     => 'https://github.com/franck-paul/spamplemousse2',
+        'repository'  => 'https://raw.githubusercontent.com/franck-paul/spamplemousse2/main/dcstore.xml',
     ]
 );
