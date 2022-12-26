@@ -140,6 +140,10 @@ abstract class tokenizer
         }
 
         $tab = [];
+        if (!is_array($t)) {
+            return $tab;
+        }
+
         foreach ($t as $e) {
             if ($e['final'] == 0) {
                 if (!empty($e['elem'])) {
