@@ -88,7 +88,7 @@ class progress
         if ($this->pos < $this->stop) {
             $return .= 'style="display: none;"';
         }
-        $return .= ' href="' . $this->urlreturn . '">' . __('Retour') . '</a>';
+        $return .= ' href="' . $this->urlreturn . '">' . __('Return') . '</a>';
 
         if (!$this->first_run) {
             if ($this->pos >= $this->stop) {
@@ -123,7 +123,7 @@ class progress
                         '<input type="hidden" name="stop" value="' . $this->stop . '" />' .
                         '<input type="hidden" name="total_elapsed" value="' . $this->total_elapsed . '" />' .
                         '<input type="hidden" name="xd_check" value="' . $this->nonce . '" />' .
-                        '<input type="submit" id="next" value="' . __('Continuer') . '" />' .
+                        '<input type="submit" id="next" value="' . __('Continue') . '" />' .
                         '</form>';
             $content .= $return;
 
