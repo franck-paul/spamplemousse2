@@ -1,39 +1,34 @@
 <?php
-
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of Spamplemousse2, a plugin for Dotclear 2.
-#
-# Copyright (c) 2003-2008 Olivier Meunier and contributors
-# Licensed under the GPL version 2.0 license.
-# See LICENSE file or
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
+/**
+ * @brief Spamplemousse2, a plugin for Dotclear 2
+ *
+ * @package Dotclear
+ * @subpackage Plugins
+ *
+ * @author Alain Vagner and contributors
+ *
+ * @copyright Alain Vagner
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 /**
-@ingroup SPAMPLE2
-@brief email tokenizer
-
-this class has to tokenize email addresses
+ * This class has to tokenize email addresses
  */
 class email_tokenizer extends tokenizer
 {
-    /**
-    Constructor
-     */
     public function __construct()
     {
         $this->prefix = 'email';
     }
 
     /**
-    Matches mail addresses in a string
-
-    @param	str		<b>string</b>		the string to analyze
-    @return 		<b>array</b>		array of strings, containing : (left string, match1, match2, ..., right string)
+     * Matches email addresses in a string
+     *
+     * @param      string            $str    The string to analyze
+     *
+     * @return     array|int|string  Array of strings, containing : (left string, match1, match2, ..., right string)
      */
-    protected function match($str)
+    protected function match(string $str)
     {
         $result  = '';
         $matches = '';
@@ -45,8 +40,7 @@ class email_tokenizer extends tokenizer
         $tld         = '[A-Z]{2,6}';
 
         $regexp = '(' . $debut_mail . $elem_mail . '*)@(' . $extrem_host . $elem_host . $extrem_host . '\.' . $tld . ')';
-        $res    = preg_match('/' . $regexp . '(.*)/uism', $str, $matches);
-        if ($res != 0) {
+        if (preg_match('/' . $regexp . '(.*)/uism', $str, $matches)) {
             $result = [];
 
             $mail     = $matches[1] . '@' . $matches[2];

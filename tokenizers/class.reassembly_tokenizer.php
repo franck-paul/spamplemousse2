@@ -1,31 +1,29 @@
 <?php
-
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of Spamplemousse2, a plugin for Dotclear 2.
-#
-# Copyright (c) 2003-2008 Olivier Meunier and contributors
-# Licensed under the GPL version 2.0 license.
-# See LICENSE file or
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
+/**
+ * @brief Spamplemousse2, a plugin for Dotclear 2
+ *
+ * @package Dotclear
+ * @subpackage Plugins
+ *
+ * @author Alain Vagner and contributors
+ *
+ * @copyright Alain Vagner
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 /**
-@ingroup SPAMPLE2
-@brief reassembly tokenizer
-
-this class detects and reassembles tokens like v.i.a.g.r.a
+ * this class detects and reassembles tokens like v.i.a.g.r.a
  */
 class reassembly_tokenizer extends tokenizer
 {
     /**
-    Matches tokens of length equal to 1 separated only by 1 delimiter
-
-    @param	str		<b>string</b>		the string to analyze
-    @return 		<b>array</b>		array of strings, containing : (left string, match1, match2, ..., right string)
+     * Matches tokens of length equal to 1 separated only by 1 delimiter
+     *
+     * @param      string            $str    The string to analyze
+     *
+     * @return     array|int|string  Array of strings, containing : (left string, match1, match2, ..., right string)
      */
-    protected function match($str)
+    protected function match(string $str)
     {
         $result  = '';
         $matches = '';
@@ -33,8 +31,7 @@ class reassembly_tokenizer extends tokenizer
         $regexp = '([$.:*|`@_]?([\w][$.:*|`@_])+[\w]?)';
         # FIXME this regexp does not detect "v i a g r a"
         # FIXME it does not seem to work with UTF8 words
-        $res = preg_match('/' . $regexp . '(.*)/uism', $str, $matches);
-        if ($res != 0) {
+        if (preg_match('/' . $regexp . '(.*)/uism', $str, $matches)) {
             $result   = [];
             $word_tmp = $matches[1];
             $word     = '';

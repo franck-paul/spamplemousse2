@@ -1,33 +1,31 @@
 <?php
-
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of Spamplemousse2, a plugin for Dotclear 2.
-#
-# Copyright (c) 2003-2008 Olivier Meunier and contributors
-# Licensed under the GPL version 2.0 license.
-# See LICENSE file or
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
+/**
+ * @brief Spamplemousse2, a plugin for Dotclear 2
+ *
+ * @package Dotclear
+ * @subpackage Plugins
+ *
+ * @author Alain Vagner and contributors
+ *
+ * @copyright Alain Vagner
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 /**
-@ingroup PROGRESS
-@brief Progress rest interface
-
-This class calls the toXml method of the progress class with the GET parameters
+ * This class calls the toXml method of the progress class with the GET parameters
  */
 class progressRest
 {
     /**
-    Call the toXml method
-
-    @param	core		<b>DcCore</b>		Dotclear core object
-    @param	get			<b>array</b>		Get	parameters
-    @param	post		<b>array</b>		Post parameters
-    @return				<b>XmlTag</b>		XML message
+     * Posts a progress.
+     *
+     * @param      dcCore  $core   The core
+     * @param      array   $get    The get parameters
+     * @param      array   $post   The post parameters
+     *
+     * @return     xmlTag  The xml message.
      */
-    public static function postProgress($core, $get, $post)
+    public static function postProgress(dcCore $core, array $get, array $post): xmlTag
     {
         $title      = '';
         $urlprefix  = '';

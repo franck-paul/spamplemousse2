@@ -1,21 +1,18 @@
 <?php
-
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of Spamplemousse2, a plugin for Dotclear 2.
-#
-# Copyright (c) 2003-2008 Olivier Meunier and contributors
-# Licensed under the GPL version 2.0 license.
-# See LICENSE file or
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
+/**
+ * @brief Spamplemousse2, a plugin for Dotclear 2
+ *
+ * @package Dotclear
+ * @subpackage Plugins
+ *
+ * @author Alain Vagner and contributors
+ *
+ * @copyright Alain Vagner
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 /**
-@ingroup SPAMPLE2
-@brief ip tokenizer
-
-this class has to tokenize ip addresses
+ * this class has to tokenize ip addresses
  */
 class ip_tokenizer extends tokenizer
 {
@@ -25,19 +22,19 @@ class ip_tokenizer extends tokenizer
     }
 
     /**
-    Matches ip addresses in a string
-
-    @param	str		<b>string</b>		the string to analyze
-    @return 		<b>array</b>		array of strings, containing : (left string, match1, match2, ..., right string)
+     * Matches IPv4 addresses in a string
+     *
+     * @param      string            $str    The string to analyze
+     *
+     * @return     array|int|string  Array of strings, containing : (left string, match1, match2, ..., right string)
      */
-    protected function match($str)
+    protected function match(string $str)
     {
         $result  = '';
         $matches = '';
         $num     = '(25[0-5]|2[0-4]\d|[01]?\d\d|\d)';
         $regexp  = $num . '\.' . $num . '\.' . $num . '\.' . $num;
-        $res     = preg_match('/' . $regexp . '(.*)/uism', $str, $matches);
-        if ($res != 0) {
+        if (preg_match('/' . $regexp . '(.*)/uism', $str, $matches)) {
             $result   = [];
             $ip       = $matches[1] . '.' . $matches[2] . '.' . $matches[3] . '.' . $matches[4];
             $pos      = mb_strpos($str, $ip . $matches[5]);

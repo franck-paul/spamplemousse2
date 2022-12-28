@@ -1,24 +1,18 @@
 <?php
-
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of Spamplemousse2, a plugin for Dotclear 2.
-#
-# Copyright (c) 2003-2008 Olivier Meunier and contributors
-# Licensed under the GPL version 2.0 license.
-# See LICENSE file or
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
-
-/// @defgroup SPAMPLE2 Spamplemousse2, a bayesian spam filter
+/**
+ * @brief Spamplemousse2, a plugin for Dotclear 2
+ *
+ * @package Dotclear
+ * @subpackage Plugins
+ *
+ * @author Alain Vagner and contributors
+ *
+ * @copyright Alain Vagner
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 /**
-@ingroup SPAMPLE2
-@brief Spamplemousse2 filter adapter class
-
-This class implements all the methods needed for this plugin
-to run as a spam filter.
+ * This class implements all the methods needed for this plugin to run as a spam filter.
  */
 class dcFilterSpample2 extends dcSpamFilter
 {
@@ -26,9 +20,7 @@ class dcFilterSpample2 extends dcSpamFilter
     public $has_gui = true;
 
     /**
-    Set here the localized description of the filter.
-
-    @return			<b>string</b>
+     * Sets the filter description.
      */
     protected function setInfo()
     {
@@ -36,18 +28,21 @@ class dcFilterSpample2 extends dcSpamFilter
     }
 
     /**
-    Returns a status message for a given comment which relates to the filtering process.
-
-    @param	status			<b>integer</b>		Status of the comment
-    @param	comment_id		<b>integer</b>		Id of the comment
-    @return					<b>string</b>
+     * This method returns filter status message. You can overload this method to
+     * return a custom message. Message is shown in comment details and in
+     * comments list.
+     *
+     * @param      string  $status      The status
+     * @param      int     $comment_id  The comment identifier
+     *
+     * @return     string  The status message.
      */
-    public function getStatusMessage($status, $comment_id)
+    public function getStatusMessage(string $status, ?int $comment_id)
     {
         $p          = 0;
         $con        = dcCore::app()->con;
-        $spamFilter = new bayesian(dcCore::app());
-        $rs         = new dcRecord($con->select('SELECT comment_author, comment_email, comment_site, comment_ip, comment_content FROM ' . dcCore::app()->blog->prefix . dcblog::COMMENT_TABLE_NAME . ' WHERE comment_id = ' . $comment_id));
+        $spamFilter = new bayesian();
+        $rs         = new dcRecord($con->select('SELECT comment_author, comment_email, comment_site, comment_ip, comment_content FROM ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME . ' WHERE comment_id = ' . $comment_id));
         $rs->fetch();
         $p = $spamFilter->getMsgProba($rs->comment_author, $rs->comment_email, $rs->comment_site, $rs->comment_ip, $rs->comment_content);
         $p = round($p * 100);
@@ -56,35 +51,26 @@ class dcFilterSpample2 extends dcSpamFilter
     }
 
     /**
-    This method should return if a comment is a spam or not.
-
-    Your filter should also fill $status variable with its own information if
-    comment is a spam.
-
-    @param		type	<b>string</b>		Comment type (comment or trackback)
-    @param		author	<b>string</b>		Comment author
-    @param		email	<b>string</b>		Comment author email
-    @param		site	<b>string</b>		Comment author website
-    @param		ip		<b>string</b>		Comment author IP address
-    @param		content	<b>string</b>		Comment content
-    @param		post_id	<b>integer</b>		Comment post_id
-    @param[out]	status	<b>integer</b>		Comment status
-    @return				<b>boolean</b>
+     * This method should return if a comment is a spam or not. If it returns true
+     * or false, execution of next filters will be stoped. If should return nothing
+     * to let next filters apply.
+     *
+     * Your filter should also fill $status variable with its own information if
+     * comment is a spam.
+     *
+     * @param      string  $type     The comment type (comment / trackback)
+     * @param      string  $author   The comment author
+     * @param      string  $email    The comment author email
+     * @param      string  $site     The comment author site
+     * @param      string  $ip       The comment author IP
+     * @param      string  $content  The comment content
+     * @param      int     $post_id  The comment post_id
+     * @param      string  $status   The comment status
      */
-    public function isSpam(
-        $type,
-        $author,
-        $email,
-        $site,
-        $ip,
-        $content,
-        $post_id,
-        &$status
-    ) {
-        $spamFilter = new bayesian(dcCore::app());
-
-        $spam = $spamFilter->handle_new_message($author, $email, $site, $ip, $content);
-
+    public function isSpam(string $type, ?string $author, ?string $email, ?string $site, ?string $ip, ?string $content, ?int $post_id, string &$status)
+    {
+        $spamFilter = new bayesian();
+        $spam       = $spamFilter->handle_new_message($author, $email, $site, $ip, $content);
         if ($spam) {
             $status = '';
         }
@@ -93,33 +79,23 @@ class dcFilterSpample2 extends dcSpamFilter
     }
 
     /**
-    This method is called when a non-spam (ham) comment becomes spam or when a
-    spam becomes a ham. It trains the filter with this new user decision.
-
-    @param[out]	status	<b>integer</b>		Comment status
-    @param	filter		<b>string</b>		Filter name
-    @param	type		<b>string</b>		Comment type (comment or trackback)
-    @param	author		<b>string</b>		Comment author
-    @param	email		<b>string</b>		Comment author email
-    @param	site		<b>string</b>		Comment author website
-    @param	ip			<b>string</b>		Comment author IP address
-    @param	content		<b>string</b>		Comment content
-    @param	rs			<b>dcRecord</b>		Comment record
+     * Train the antispam filter
+     *
+     * @param      string        $status   The comment status
+     * @param      string        $filter   The filter
+     * @param      string        $type     The comment type
+     * @param      string        $author   The comment author
+     * @param      string        $email    The comment author email
+     * @param      string        $site     The comment author site
+     * @param      string        $ip       The comment author IP
+     * @param      string        $content  The comment content
+     * @param      dcRecord      $rs       The comment record
      */
-    public function trainFilter(
-        $status,
-        $filter,
-        $type,
-        $author,
-        $email,
-        $site,
-        $ip,
-        $content,
-        $rs
-    ) {
-        $spamFilter = new bayesian(dcCore::app());
+    public function trainFilter(string $status, string $filter, string $type, ?string $author, ?string $email, ?string $site, ?string $ip, ?string $content, dcRecord $rs)
+    {
+        $spamFilter = new bayesian();
 
-        $rs2 = new dcRecord(dcCore::app()->con->select('SELECT comment_bayes, comment_bayes_err FROM ' . dcCore::app()->blog->prefix . dcblog::COMMENT_TABLE_NAME . ' WHERE comment_id = ' . $rs->comment_id));
+        $rs2 = new dcRecord(dcCore::app()->con->select('SELECT comment_bayes, comment_bayes_err FROM ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME . ' WHERE comment_id = ' . $rs->comment_id));
         $rs2->fetch();
 
         $spam = 0;
@@ -129,32 +105,33 @@ class dcFilterSpample2 extends dcSpamFilter
 
         if ($rs2->comment_bayes == 0) {
             $spamFilter->train($author, $email, $site, $ip, $content, $spam);
-            $req = 'UPDATE ' . dcCore::app()->blog->prefix . dcblog::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
+            $req = 'UPDATE ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
             dcCore::app()->con->execute($req);
         } else {
             $spamFilter->retrain($author, $email, $site, $ip, $content, $spam);
             $err = $rs2->comment_bayes_err ? 0 : 1;
-            $req = 'UPDATE ' . dcCore::app()->blog->prefix . dcblog::COMMENT_TABLE_NAME . ' SET comment_bayes_err = ' . $err . ' WHERE comment_id = ' . $rs->comment_id;
+            $req = 'UPDATE ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME . ' SET comment_bayes_err = ' . $err . ' WHERE comment_id = ' . $rs->comment_id;
             dcCore::app()->con->execute($req);
         }
     }
 
     /**
-    This method handles the main gui used to configure this plugin.
-
-    @param	url			<b>string</b>		url of the plugin
-    @return				<b>string</b>		html content
+     * This method handles the main gui used to configure this plugin.
+     *
+     * @param      string           $url    The url of the plugin
+     *
+     * @return     string  HTML content
      */
     public function gui(string $url): string
     {
         $content    = '';
-        $spamFilter = new bayesian(dcCore::app());
+        $spamFilter = new bayesian();
 
         $action = !empty($_POST['action']) ? $_POST['action'] : null;
 
         # count nr of comments
         $nb_comm = 0;
-        $req     = 'SELECT COUNT(comment_id) FROM ' . dcCore::app()->blog->prefix . dcblog::COMMENT_TABLE_NAME;
+        $req     = 'SELECT COUNT(comment_id) FROM ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME;
         $rs      = new dcRecord(dcCore::app()->con->select($req));
         if ($rs->fetch()) {
             $nb_comm = $rs->f(0);
@@ -228,21 +205,22 @@ class dcFilterSpample2 extends dcSpamFilter
     }
 
     /**
-    This method is a hack to toggle the "learned" flag on a given comment.
-    When a comment passes through the isSpam method of this filter for the first
-    time, it is possible that the filter learns from this message, but in isSpam
-    we are too early in the filtering process to be able to toggle the flag. So
-    we set the global dcCore::app()->spamplemousse2_learned to 1, and when the process comes to
-    its end, this method is triggered (by the events publicAfterCommentCreate and
-    publicAfterTrackbackCreate), and we update the flag in the database.
-
-    @param	cur			<b>cursor</b>		cursor on the comment
-    @param	id			<b>integer</b>		id of the comment
+     * This method is a hack to toggle the "learned" flag on a given comment.
+     *
+     * When a comment passes through the isSpam method of this filter for the first
+     * time, it is possible that the filter learns from this message, but in isSpam
+     * we are too early in the filtering process to be able to toggle the flag. So
+     * we set the global dcCore::app()->spamplemousse2_learned to 1, and when the process comes to
+     * its end, this method is triggered (by the events publicAfterCommentCreate and
+     * publicAfterTrackbackCreate), and we update the flag in the database.
+     *
+     * @param      cursor  $cur    The cursor on the comment
+     * @param      int     $id     The identifier of the comment
      */
-    public static function toggleLearnedFlag($cur, $id)
+    public static function toggleLearnedFlag(cursor $cur, int $id)
     {
-        if (isset(dcCore::app()->spamplemousse2_learned) && dcCore::app()->spamplemousse2_learned == 1) {
-            $req = 'UPDATE ' . dcCore::app()->blog->prefix . dcblog::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $id;
+        if (isset(dcCore::app()->spamplemousse2_learned) && dcCore::app()->spamplemousse2_learned == 1) {   // @phpstan-ignore-line
+            $req = 'UPDATE ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $id;
             dcCore::app()->con->execute($req);
         }
     }

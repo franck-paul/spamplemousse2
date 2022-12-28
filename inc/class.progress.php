@@ -1,60 +1,59 @@
 <?php
-
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of Spamplemousse2, a plugin for Dotclear 2.
-#
-# Copyright (c) 2003-2008 Olivier Meunier and contributors
-# Licensed under the GPL version 2.0 license.
-# See LICENSE file or
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
 /**
-@ingroup PROGRESS
-@brief Progress main class
+ * @brief Spamplemousse2, a plugin for Dotclear 2
+ *
+ * @package Dotclear
+ * @subpackage Plugins
+ *
+ * @author Alain Vagner and contributors
+ *
+ * @copyright Alain Vagner
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
+/**
 This class implements a progress bar system for some lengthy php scripts.
  */
 class progress
 {
-    private $title;
-    private $urlprefix;
-    private $urlreturn;
-    private $func;
-    private $start;
-    private $stop;
-    private $baseinc;
-    private $pos;
-    private $first_run = false;
-    private $total_elapsed;
-    private $total_time;
-    private $percent = 0;
-    private $eta;
-    private $nonce;
-    private $formparams;
+    private string $title;
+    private string $urlprefix;
+    private string $urlreturn;
+    private array $func;
+    private int $start;
+    private int $stop;
+    private int $baseinc;
+    private int $pos;
+    private bool $first_run = false;
+    private float $total_elapsed;
+    private float $total_time;
+    private float $percent = 0;
+    private float $eta;
+    private string $nonce;
+    private string $formparams;
 
     /**
-    Constructor
-
-    @param	title		<b>string</b>		Title of the page
-    @param	urlprefix	<b>string</b>		Prefix for all urls
-    @param	urlreturn	<b>string</b>		URL for quitting the interface
-    @param	func		<b>array</b>		Static method to call (e.g. array('class', 'method'))
-                                            this method must have two parameters "limit" and "offset" like in a sql query
-    @param	start		<b>integer</b>		Id of the starting point
-    @param	stop		<b>integer</b>		Id of the end point
-    @param	baseinc		<b>integer</b>		Number of items to process on each loop
-    @param	nonce		<b>string</b>		Session token
-    @param	pos			<b>integer</b>		Current position (in order to resume processing)
-    @param  formparams  <b>string</b>		parameters to add to the form
+     * Constructs a new instance.
+     *
+     * @param      string      $title       The title of the page
+     * @param      string      $urlprefix   The prefix for all urls
+     * @param      string      $urlreturn   The URL for quitting the interface
+     * @param      array       $func        The Static method to call (e.g. array('class', 'method')
+     * @param      int         $start       The Id of the starting point
+     * @param      int         $stop        The Id of the end point
+     * @param      int         $baseinc     The number of items to process on each loop
+     * @param      string      $nonce       The session token
+     * @param      int         $pos         The current position (in order to resume processing)
+     * @param      string      $formparams  The parameters to add to the form
+     *
+     * Note: the func item method must have two parameters "limit" and "offset" like in a sql query
      */
-    public function __construct($title, $urlprefix, $urlreturn, $func, $start, $stop, $baseinc, $nonce, $pos = '', $formparams = '')
+    public function __construct(string $title, string $urlprefix, string $urlreturn, array $func, int $start, int $stop, int $baseinc, string $nonce, int $pos = 0, string $formparams = '')
     {
         $this->start = !empty($_POST['start']) ? $_POST['start'] : $start;
         if ($_POST['pos'] != '') {
-            $this->pos = $_POST['pos'];
-        } elseif ($pos != '') {
+            $this->pos = (int) $_POST['pos'];
+        } elseif ($pos) {
             $this->pos       = $pos;
             $this->first_run = true;
         } else {
@@ -74,12 +73,13 @@ class progress
     }
 
     /**
-    Display the progress interface
-
-    @param	content		<b>string</b>		Content of the page
-    @return				<b>string</b>		Content after modification.
+     * Display the progress interface
+     *
+     * @param      string  $content  The content of the âge
+     *
+     * @return     string  The content after modification.
      */
-    public function gui($content)
+    public function gui(string $content): string
     {
         $content .= '<h3>' . $this->title . '</h3>';
         $error = '';
@@ -138,11 +138,11 @@ class progress
     }
 
     /**
-    Rest interface
-
-    @return				<b>XmlTag</b>	xml message
+     * Rest interface
+     *
+     * @return     xmlTag  Xml message.
      */
-    public function toXml()
+    public function toXml(): xmlTag
     {
         $rsp   = new xmlTag();
         $error = '';
@@ -177,23 +177,23 @@ class progress
                 $rsp->insertNode($eta_xml);
             }
             $pos_xml = new xmlTag('pos');
-            $pos_xml->insertNode($this->pos);
+            $pos_xml->insertNode((string) $this->pos);
             $rsp->insertNode($pos_xml);
 
             $total_xml = new xmlTag('total_elapsed');
-            $total_xml->insertNode($this->total_elapsed);
+            $total_xml->insertNode((string) $this->total_elapsed);
             $rsp->insertNode($total_xml);
 
             $start_xml = new xmlTag('start');
-            $start_xml->insertNode($this->start);
+            $start_xml->insertNode((string) $this->start);
             $rsp->insertNode($start_xml);
 
             $stop_xml = new xmlTag('stop');
-            $stop_xml->insertNode($this->stop);
+            $stop_xml->insertNode((string) $this->stop);
             $rsp->insertNode($stop_xml);
 
             $baseinc_xml = new xmlTag('baseinc');
-            $baseinc_xml->insertNode($this->baseinc);
+            $baseinc_xml->insertNode((string) $this->baseinc);
             $rsp->insertNode($baseinc_xml);
 
             $funcClass_xml = new xmlTag('funcClass');
@@ -213,7 +213,7 @@ class progress
     }
 
     /**
-    Call the given method
+     * Call the given method
      */
     private function compute()
     {

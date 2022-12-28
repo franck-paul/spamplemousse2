@@ -1,19 +1,17 @@
 <?php
-
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of Spamplemousse2, a plugin for Dotclear 2.
-#
-# Copyright (c) 2003-2008 Olivier Meunier and contributors
-# Licensed under the GPL version 2.0 license.
-# See LICENSE file or
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
 /**
-@ingroup SPAMPLE2
-@brief url tokenizer
+ * @brief Spamplemousse2, a plugin for Dotclear 2
+ *
+ * @package Dotclear
+ * @subpackage Plugins
+ *
+ * @author Alain Vagner and contributors
+ *
+ * @copyright Alain Vagner
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
+/**
 this class tokenizes urls
  */
 class url_tokenizer extends tokenizer
@@ -24,10 +22,11 @@ class url_tokenizer extends tokenizer
     }
 
     /**
-    Matches urls in a string
-
-    @param	str		<b>string</b>		the string to analyze
-    @return 		<b>array</b>		array of strings, containing : (left string, match1, match2, ..., right string)
+     * Matches urls in a string
+     *
+     * @param      string            $str    The string
+     *
+     * @return     array|int|string     Array of strings, containing : (left string, match1, match2, ..., right string)
      */
     protected function match($str)
     {

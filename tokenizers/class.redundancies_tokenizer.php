@@ -1,40 +1,36 @@
 <?php
-
-# -- BEGIN LICENSE BLOCK ----------------------------------
-#
-# This file is part of Spamplemousse2, a plugin for Dotclear 2.
-#
-# Copyright (c) 2003-2008 Olivier Meunier and contributors
-# Licensed under the GPL version 2.0 license.
-# See LICENSE file or
-# http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-#
-# -- END LICENSE BLOCK ------------------------------------
+/**
+ * @brief Spamplemousse2, a plugin for Dotclear 2
+ *
+ * @package Dotclear
+ * @subpackage Plugins
+ *
+ * @author Alain Vagner and contributors
+ *
+ * @copyright Alain Vagner
+ * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
+ */
 
 /**
-@ingroup SPAMPLE2
-@brief redundancies tokenizer
-
-this class detects and normalizes redundancies in a string
+ * This class detects and normalizes redundancies in a string
  */
 class redundancies_tokenizer extends tokenizer
 {
     /**
-    Matches redundancies in a string (example: viagra!!!!!!! becomes viagra!)
-
-    @param	str		<b>string</b>		the string to analyze
-    @return 		<b>array</b>		array of strings, containing : (left string, match1, match2, ..., right string)
+     * Matches redundancies in a string (example: viagra!!!!!!! becomes viagra!)
+     *
+     * @param      string            $str    The string to analyze
+     *
+     * @return     array|int|string  Array of strings, containing : (left string, match1, match2, ..., right string)
      */
-    protected function match($str)
+    protected function match(string $str)
     {
         $result  = '';
         $matches = '';
 
         $regexp = '([\w.-]+[!?]{1})([!?]+)';
-        $res    = preg_match('/' . $regexp . '(.*)/uism', $str, $matches);
-        if ($res != 0) {
-            $result = [];
-
+        if (preg_match('/' . $regexp . '(.*)/uism', $str, $matches)) {
+            $result   = [];
             $word     = $matches[1];
             $pos      = mb_strpos($str, $word);
             $result[] = mb_substr($str, 0, $pos);
