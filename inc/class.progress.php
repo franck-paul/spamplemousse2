@@ -11,6 +11,8 @@
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 
+use Dotclear\Helper\Html\XmlTag;
+
 /**
 This class implements a progress bar system for some lengthy php scripts.
  */
@@ -140,16 +142,16 @@ class progress
     /**
      * Rest interface
      *
-     * @return     xmlTag  Xml message.
+     * @return     XmlTag  Xml message.
      */
-    public function toXml(): xmlTag
+    public function toXml(): XmlTag
     {
-        $rsp   = new xmlTag();
+        $rsp   = new XmlTag();
         $error = '';
 
         if (!$this->first_run) {
             if ($this->pos >= $this->stop) {
-                $return_xml = new xmlTag('return');
+                $return_xml = new XmlTag('return');
                 $return_xml->insertNode($this->urlreturn);
                 $rsp->insertNode($return_xml);
 
@@ -164,47 +166,47 @@ class progress
         }
 
         if ($error != '') {
-            $error_xml = new xmlTag('error');
+            $error_xml = new XmlTag('error');
             $error_xml->insertNode($error);
             $rsp->insertNode($error_xml);
         } else {
-            $percent_xml = new xmlTag('percent');
+            $percent_xml = new XmlTag('percent');
             $percent_xml->insertNode(sprintf('%d', $this->percent));
             $rsp->insertNode($percent_xml);
             if ($this->percent != 0) {
-                $eta_xml = new xmlTag('eta');
+                $eta_xml = new XmlTag('eta');
                 $eta_xml->insertNode(sprintf('%d', $this->eta));
                 $rsp->insertNode($eta_xml);
             }
-            $pos_xml = new xmlTag('pos');
+            $pos_xml = new XmlTag('pos');
             $pos_xml->insertNode((string) $this->pos);
             $rsp->insertNode($pos_xml);
 
-            $total_xml = new xmlTag('total_elapsed');
+            $total_xml = new XmlTag('total_elapsed');
             $total_xml->insertNode((string) $this->total_elapsed);
             $rsp->insertNode($total_xml);
 
-            $start_xml = new xmlTag('start');
+            $start_xml = new XmlTag('start');
             $start_xml->insertNode((string) $this->start);
             $rsp->insertNode($start_xml);
 
-            $stop_xml = new xmlTag('stop');
+            $stop_xml = new XmlTag('stop');
             $stop_xml->insertNode((string) $this->stop);
             $rsp->insertNode($stop_xml);
 
-            $baseinc_xml = new xmlTag('baseinc');
+            $baseinc_xml = new XmlTag('baseinc');
             $baseinc_xml->insertNode((string) $this->baseinc);
             $rsp->insertNode($baseinc_xml);
 
-            $funcClass_xml = new xmlTag('funcClass');
+            $funcClass_xml = new XmlTag('funcClass');
             $funcClass_xml->insertNode($this->func[0]);
             $rsp->insertNode($funcClass_xml);
 
-            $funcMethod_xml = new xmlTag('funcMethod');
+            $funcMethod_xml = new XmlTag('funcMethod');
             $funcMethod_xml->insertNode($this->func[1]);
             $rsp->insertNode($funcMethod_xml);
 
-            $nonce_xml = new xmlTag('nonce');
+            $nonce_xml = new XmlTag('nonce');
             $nonce_xml->insertNode($this->nonce);
             $rsp->insertNode($nonce_xml);
         }

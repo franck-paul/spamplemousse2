@@ -11,10 +11,12 @@
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 
+use Dotclear\Plugin\antispam\SpamFilter;
+
 /**
  * This class implements all the methods needed for this plugin to run as a spam filter.
  */
-class dcFilterSpample2 extends dcSpamFilter
+class dcFilterSpample2 extends SpamFilter
 {
     public $name    = 'Spamplemousse2';
     public $has_gui = true;

@@ -30,7 +30,7 @@ class url_tokenizer extends tokenizer
      */
     protected function match($str)
     {
-        $result  = '';
+        $result  = [];
         $matches = '';
 
         $scheme      = 'http:\/\/';

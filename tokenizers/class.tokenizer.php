@@ -116,7 +116,7 @@ abstract class tokenizer
                         }
                     }
                 } while ($remain != '');
-                $tab = array_merge($tab, $cur);
+                $tab = [...$tab, ...$cur];
             } else {
                 $tab[] = $e;
             }

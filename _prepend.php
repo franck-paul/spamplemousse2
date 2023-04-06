@@ -10,6 +10,9 @@
  * @copyright Alain Vagner
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
+
+use Dotclear\Helper\Clearbricks;
+
 Clearbricks::lib()->autoload([
     'bayesian'               => __DIR__ . '/inc/class.bayesian.php',
     'tokenizer'              => __DIR__ . '/tokenizers/class.tokenizer.php',

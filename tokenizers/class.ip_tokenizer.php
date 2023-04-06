@@ -30,7 +30,7 @@ class ip_tokenizer extends tokenizer
      */
     protected function match(string $str)
     {
-        $result  = '';
+        $result  = [];
         $matches = '';
         $num     = '(25[0-5]|2[0-4]\d|[01]?\d\d|\d)';
         $regexp  = $num . '\.' . $num . '\.' . $num . '\.' . $num;

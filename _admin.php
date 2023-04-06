@@ -11,6 +11,8 @@
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
 
+use Dotclear\Helper\Html\XmlTag;
+
 /**
  * This class calls the toXml method of the progress class with the GET parameters
  */
@@ -23,9 +25,9 @@ class progressRest
      * @param      array   $get    The get parameters
      * @param      array   $post   The post parameters
      *
-     * @return     xmlTag  The xml message.
+     * @return     XmlTag  The xml message.
      */
-    public static function postProgress(dcCore $core, array $get, array $post): xmlTag
+    public static function postProgress(dcCore $core, array $get, array $post): XmlTag
     {
         $title      = '';
         $urlprefix  = '';

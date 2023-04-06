@@ -25,7 +25,7 @@ class redundancies_tokenizer extends tokenizer
      */
     protected function match(string $str)
     {
-        $result  = '';
+        $result  = [];
         $matches = '';
 
         $regexp = '([\w.-]+[!?]{1})([!?]+)';

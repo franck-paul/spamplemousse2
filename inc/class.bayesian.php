@@ -19,14 +19,14 @@ class bayesian
     public const SPAM_TOKEN_TABLE_NAME = 'spam_token';
 
     private $con;
-    private $table;
-    private $val_hapax;
-    private $sct_spam;
-    private $sct_ham;
-    private $bias;
-    private $retrain_limit;
-    private $training_mode;
-    private $tum_maturity;
+    private string $table;
+    private float $val_hapax;
+    private float $sct_spam;
+    private float $sct_ham;
+    private int $bias;
+    private int $retrain_limit;
+    private string $training_mode;
+    private int $tum_maturity;
 
     public function __construct()
     {
