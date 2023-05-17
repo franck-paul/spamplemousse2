@@ -20,7 +20,7 @@ use Dotclear\Helper\Html\XmlTag;
 /**
  * This class calls the toXml method of the progress class with the GET parameters
  */
-class progressRest
+class BackendRest
 {
     /**
      * Posts a progress.

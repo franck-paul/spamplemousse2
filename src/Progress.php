@@ -122,6 +122,7 @@ class Progress
                 $content .= sprintf('%d', $this->eta) . ' s';
             }
             $content .= '</span></p>';
+
             $content .= '<form action="' . $this->urlprefix . '" method="post">' .
                         $this->formparams .
                         '<input type="hidden" name="pos" value="' . $this->pos . '" />' .
@@ -131,6 +132,7 @@ class Progress
                         '<input type="hidden" name="xd_check" value="' . $this->nonce . '" />' .
                         '<input type="submit" id="next" value="' . __('Continue') . '" />' .
                         '</form>';
+
             $content .= $return;
 
             $content .= '<script type="text/javascript">' .

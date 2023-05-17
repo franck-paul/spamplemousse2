@@ -1,6 +1,6 @@
 /*global $ */
 /*export progressUpdate */
-"use strict";
+'use strict';
 
 function progressUpdate(funcClass, funcMethod, pos, start, stop, baseInc, nonce) {
   const params = {
@@ -52,7 +52,7 @@ function update(data) {
     baseInc: $(data).find('baseinc').text(),
     funcClass: $(data).find('funcClass').text(),
     funcMethod: $(data).find('funcMethod').text(),
-    xd_check: $(data).find('nonce').text()
+    xd_check: $(data).find('nonce').text(),
   };
 
   $.post('services.php', params, (data) => {

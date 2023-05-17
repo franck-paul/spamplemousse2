@@ -115,7 +115,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
      */
     public function trainFilter(string $status, string $filter, string $type, ?string $author, ?string $email, ?string $site, ?string $ip, ?string $content, MetaRecord $rs)
     {
-        $spamFilter = new bayesian();
+        $spamFilter = new Bayesian();
 
         $rsBayes = (new SelectStatement())
             ->fields(['comment_bayes', 'comment_bayes_err'])
@@ -160,7 +160,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
     public function gui(string $url): string
     {
         $content    = '';
-        $spamFilter = new bayesian();
+        $spamFilter = new Bayesian();
 
         $action = !empty($_POST['action']) ? $_POST['action'] : null;
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Dotclear 2 spamplemousse2 module\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-16 16:47+0200\n"
+"POT-Creation-Date: 2023-05-17 13:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,91 +16,91 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:31
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:42
 msgid "A bayesian filter"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:54
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:72
 #, php-format
 msgid "Filtered by %s, actual spamminess: %s %%"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:148
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:183
 msgid "Cleanup successful."
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:158
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:191
 msgid "Learning in progress..."
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:165
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:198
 msgid "Reset successful."
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:171
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:204
 msgid "Statistics"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:173
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:206
 msgid "Learned comments:"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:174
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:207
 msgid "Total comments:"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:175
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:208
 msgid "Learned tokens:"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:178
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:211
 msgid "Accuracy:"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:182
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:215
 msgid "Actions"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:184
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:217
 msgid "Initialization"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:186
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:223
 msgid "Learn from old messages"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:194
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:237
 msgid "Cleanup"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:200
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:244
 msgid "Reset filter"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:202
-msgid "Are you sure?"
-msgstr ""
-
-#: ../git-plugins/spamplemousse2/inc/class.dc.filter.spample2.php:202
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:250
 msgid "Delete all learned data"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.progress.php:93
+#: ../git-plugins/spamplemousse2/src/AntispamFilterSpamplemousse2.php:251
+msgid "Are you sure?"
+msgstr ""
+
+#: ../git-plugins/spamplemousse2/src/Progress.php:97
 msgid "Return"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.progress.php:110
+#: ../git-plugins/spamplemousse2/src/Progress.php:114
 msgid "Error:"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.progress.php:115
+#: ../git-plugins/spamplemousse2/src/Progress.php:119
 msgid "Progress:"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.progress.php:116
+#: ../git-plugins/spamplemousse2/src/Progress.php:120
 msgid "Time remaining:"
 msgstr ""
 
-#: ../git-plugins/spamplemousse2/inc/class.progress.php:128
+#: ../git-plugins/spamplemousse2/src/Progress.php:133
 msgid "Continue"
 msgstr ""
