@@ -1,20 +1,23 @@
 <?php
 /**
- * @brief Spamplemousse2, a plugin for Dotclear 2
+ * @brief spamplemousse2, a plugin for Dotclear 2
  *
  * @package Dotclear
  * @subpackage Plugins
  *
- * @author Alain Vagner and contributors
+ * @author Franck Paul and contributors
  *
- * @copyright Alain Vagner
+ * @copyright Franck Paul carnet.franck.paul@gmail.com
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
+declare(strict_types=1);
+
+namespace Dotclear\Plugin\spamplemousse2\Tokenizer;
 
 /**
  * this class detects and reassembles tokens like v.i.a.g.r.a
  */
-class reassembly_tokenizer extends tokenizer
+class Reassembly extends Tokenizer
 {
     /**
      * Matches tokens of length equal to 1 separated only by 1 delimiter

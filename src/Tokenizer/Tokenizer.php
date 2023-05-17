@@ -1,20 +1,23 @@
 <?php
 /**
- * @brief Spamplemousse2, a plugin for Dotclear 2
+ * @brief spamplemousse2, a plugin for Dotclear 2
  *
  * @package Dotclear
  * @subpackage Plugins
  *
- * @author Alain Vagner and contributors
+ * @author Franck Paul and contributors
  *
- * @copyright Alain Vagner
+ * @copyright Franck Paul carnet.franck.paul@gmail.com
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
+declare(strict_types=1);
+
+namespace Dotclear\Plugin\spamplemousse2\Tokenizer;
 
 /**
  * This class is the parent of all tokenizers.
  */
-abstract class tokenizer
+abstract class Tokenizer
 {
     /**
      * The prefix associated to each generated elements
@@ -108,7 +111,7 @@ abstract class tokenizer
                             $remain = trim((string) $matches[$n]);
                         } else {
                             # part of the string right to the found tokens
-                            $remain = trim((string) $remain);
+                            $remain = trim($remain);
                             if ($remain != '') {
                                 $cur[]  = $this->create_token($remain, $pre, false);
                                 $remain = '';
@@ -142,9 +145,6 @@ abstract class tokenizer
         }
 
         $tab = [];
-        if (!is_array($t)) {
-            return $tab;
-        }
 
         foreach ($t as $e) {
             if (!$e['final']) {

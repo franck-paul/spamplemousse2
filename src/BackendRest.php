@@ -1,16 +1,20 @@
 <?php
 /**
- * @brief Spamplemousse2, a plugin for Dotclear 2
+ * @brief spamplemousse2, a plugin for Dotclear 2
  *
  * @package Dotclear
  * @subpackage Plugins
  *
- * @author Alain Vagner and contributors
+ * @author Franck Paul and contributors
  *
- * @copyright Alain Vagner
+ * @copyright Franck Paul carnet.franck.paul@gmail.com
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
+declare(strict_types=1);
 
+namespace Dotclear\Plugin\spamplemousse2;
+
+use dcCore;
 use Dotclear\Helper\Html\XmlTag;
 
 /**
@@ -39,10 +43,8 @@ class progressRest
         $stop       = !empty($post['stop']) ? $post['stop'] : 0;
         $baseInc    = !empty($post['baseInc']) ? $post['baseInc'] : 0;
 
-        $progress = new progress($title, $urlprefix, $urlreturn, $func, $start, $stop, $baseInc, dcCore::app()->getNonce());
+        $progress = new Progress($title, $urlprefix, $urlreturn, $func, $start, $stop, $baseInc, dcCore::app()->getNonce());
 
         return $progress->toXml();
     }
 }
-
-dcCore::app()->rest->addFunction('postProgress', [progressRest::class, 'postProgress']);

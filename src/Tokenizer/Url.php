@@ -1,20 +1,23 @@
 <?php
 /**
- * @brief Spamplemousse2, a plugin for Dotclear 2
+ * @brief spamplemousse2, a plugin for Dotclear 2
  *
  * @package Dotclear
  * @subpackage Plugins
  *
- * @author Alain Vagner and contributors
+ * @author Franck Paul and contributors
  *
- * @copyright Alain Vagner
+ * @copyright Franck Paul carnet.franck.paul@gmail.com
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
+declare(strict_types=1);
+
+namespace Dotclear\Plugin\spamplemousse2\Tokenizer;
 
 /**
 this class tokenizes urls
  */
-class url_tokenizer extends tokenizer
+class Url extends Tokenizer
 {
     public function __construct()
     {

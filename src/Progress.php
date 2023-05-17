@@ -1,22 +1,26 @@
 <?php
 /**
- * @brief Spamplemousse2, a plugin for Dotclear 2
+ * @brief spamplemousse2, a plugin for Dotclear 2
  *
  * @package Dotclear
  * @subpackage Plugins
  *
- * @author Alain Vagner and contributors
+ * @author Franck Paul and contributors
  *
- * @copyright Alain Vagner
+ * @copyright Franck Paul carnet.franck.paul@gmail.com
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
+declare(strict_types=1);
+
+namespace Dotclear\Plugin\spamplemousse2;
 
 use Dotclear\Helper\Html\XmlTag;
+use Exception;
 
 /**
 This class implements a progress bar system for some lengthy php scripts.
  */
-class progress
+class Progress
 {
     private string $title;
     private string $urlprefix;
@@ -63,8 +67,8 @@ class progress
             $this->first_run = true;
         }
         $this->stop          = !empty($_POST['stop']) ? $_POST['stop'] : $stop;
-        $this->total_elapsed = !empty($_POST['total_elapsed']) ? $_POST['total_elapsed'] : 0;
-        $this->total_time    = ini_get('max_execution_time') / 4;
+        $this->total_elapsed = !empty($_POST['total_elapsed']) ? (float) $_POST['total_elapsed'] : 0;
+        $this->total_time    = (float) ini_get('max_execution_time') / 4;
         $this->title         = $title;
         $this->urlprefix     = $urlprefix;
         $this->urlreturn     = $urlreturn;

@@ -1,20 +1,32 @@
 <?php
 /**
- * @brief Spamplemousse2, a plugin for Dotclear 2
+ * @brief spamplemousse2, a plugin for Dotclear 2
  *
  * @package Dotclear
  * @subpackage Plugins
  *
- * @author Alain Vagner and contributors
+ * @author Franck Paul and contributors
  *
- * @copyright Alain Vagner
+ * @copyright Franck Paul carnet.franck.paul@gmail.com
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
+declare(strict_types=1);
+
+namespace Dotclear\Plugin\spamplemousse2;
+
+use dcBlog;
+use dcCore;
+use Dotclear\Database\MetaRecord;
+use Dotclear\Plugin\spamplemousse2\Tokenizer\Email;
+use Dotclear\Plugin\spamplemousse2\Tokenizer\Ip;
+use Dotclear\Plugin\spamplemousse2\Tokenizer\Reassembly;
+use Dotclear\Plugin\spamplemousse2\Tokenizer\Redundancies;
+use Dotclear\Plugin\spamplemousse2\Tokenizer\Url;
 
 /**
 This class implements all the bayesian filtering logic.
  */
-class bayesian
+class Bayesian
 {
     public const SPAM_TOKEN_TABLE_NAME = 'spam_token';
 
@@ -217,11 +229,11 @@ class bayesian
      */
     private function tokenize(string $m_author, string $m_email, string $m_site, string $m_ip, string $m_content): array
     {
-        $url_t   = new url_tokenizer();
-        $email_t = new email_tokenizer();
-        $ip_t    = new ip_tokenizer();
-        $red_t   = new redundancies_tokenizer();
-        $rea_t   = new reassembly_tokenizer();
+        $url_t   = new Url();
+        $email_t = new Email();
+        $ip_t    = new Ip();
+        $red_t   = new Redundancies();
+        $rea_t   = new Reassembly();
 
         # headers handling
         $nom = $mail = $site = $ip = $contenu = [];
@@ -302,7 +314,7 @@ class bayesian
         foreach ($tok as $i) {
             $p      = $this->val_hapax;
             $strReq = 'SELECT token_nham, token_nspam, token_p FROM ' . $this->table . ' WHERE token_id = \'' . $this->con->escape($i) . '\'';
-            $rs     = new dcRecord($this->con->select($strReq));
+            $rs     = new MetaRecord($this->con->select($strReq));
             if (!$rs->isEmpty()) {
                 $p = $rs->token_p;
             }
@@ -322,11 +334,11 @@ class bayesian
     private function basic_train_unit(string $t, int $spam, bool $retrain = false)
     {
         $strReq    = 'SELECT COUNT(token_nham) FROM ' . $this->table;
-        $rs        = new dcRecord($this->con->select($strReq));
+        $rs        = new MetaRecord($this->con->select($strReq));
         $total_ham = $rs->f(0);
 
         $strReq     = 'SELECT COUNT(token_nspam) FROM ' . $this->table;
-        $rs         = new dcRecord($this->con->select($strReq));
+        $rs         = new MetaRecord($this->con->select($strReq));
         $total_spam = $rs->f(0);
 
         $token       = null;
@@ -334,7 +346,7 @@ class bayesian
 
         # we determine if the token is already in the dataset
         $strReq = 'SELECT token_nham, token_nspam, token_p, token_mature FROM ' . $this->table . ' WHERE token_id = \'' . $this->con->escape($t) . '\'';
-        $rs     = new dcRecord($this->con->select($strReq));
+        $rs     = new MetaRecord($this->con->select($strReq));
 
         if (!$rs->isEmpty()) {
             $known_token = true;
@@ -557,7 +569,7 @@ class bayesian
             dcCore::app()->spamplemousse2_bayes = new bayesian();   // @phpstan-ignore-line
         }
 
-        $rs = new dcRecord(dcCore::app()->con->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . (string) $limit . ' OFFSET ' . (string) $offset));
+        $rs = new MetaRecord(dcCore::app()->con->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . (string) $limit . ' OFFSET ' . (string) $offset));
 
         while ($rs->fetch()) {
             if ($rs->comment_bayes == 0) {
@@ -578,7 +590,7 @@ class bayesian
     public function cleanup()
     {
         $delim = '';
-        if (DC_DBDRIVER === 'pgsql') {  // @phpstan-ignore-line
+        if (dcCore::app()->con->syntax() === 'postgresql') {
             $delim = '\'';
         }
         # delete data stale for 6 months
@@ -616,7 +628,7 @@ class bayesian
     {
         $result = 0;
         $req    = 'SELECT COUNT(comment_id) FROM ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
-        $rs     = new dcRecord($this->con->select($req));
+        $rs     = new MetaRecord($this->con->select($req));
         if ($rs->fetch()) {
             $result = $rs->f(0);
         }
@@ -633,7 +645,7 @@ class bayesian
     {
         $result = 0;
         $req    = 'SELECT COUNT(comment_id) FROM ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
-        $rs     = new dcRecord($this->con->select($req));
+        $rs     = new MetaRecord($this->con->select($req));
         if ($rs->fetch()) {
             $result = $rs->f(0);
         }
@@ -650,7 +662,7 @@ class bayesian
     {
         $result = 0;
         $req    = 'SELECT COUNT(token_id) FROM ' . $this->table;
-        $rs     = new dcRecord($this->con->select($req));
+        $rs     = new MetaRecord($this->con->select($req));
         if ($rs->fetch()) {
             $result = $rs->f(0);
         }
