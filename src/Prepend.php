@@ -34,6 +34,15 @@ class Prepend extends dcNsProcess
 
         dcCore::app()->spamfilters[] = AntispamFilterSpamplemousse2::class;
 
+        if (dcCore::app()->plugins->moduleExists('Uninstaller')) {
+            // Add cleaners to Uninstaller
+            dcCore::app()->addBehavior('UninstallerCleanersConstruct', function (\Dotclear\Plugin\Uninstaller\CleanersStack $cleaners): void {
+                $cleaners
+                    ->set(new Cleaner\Fields())
+                ;
+            });
+        }
+
         return true;
     }
 }

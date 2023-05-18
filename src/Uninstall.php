@@ -87,6 +87,12 @@ class Uninstall extends dcNsProcess
                 ['delete', $table],     // Delete table
             ],
 
+            // Field (database)
+            'fields' => [
+                ['delete', 'comment:comment_bayes'],        // Delete field
+                ['delete', 'comment:comment_bayes_err'],    // Delete field
+            ],
+
             // Plugin or Theme
             (dcCore::app()->plugins->getDefines(['id' => $module]) ? 'plugins' : 'themes') => [
                 ['delete', $module],    // Same as plugin/theme Delete button in plugin/theme management
