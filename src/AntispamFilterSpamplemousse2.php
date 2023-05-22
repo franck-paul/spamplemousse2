@@ -31,7 +31,10 @@ use Dotclear\Plugin\antispam\SpamFilter;
  */
 class AntispamFilterSpamplemousse2 extends SpamFilter
 {
-    public $name    = 'Spamplemousse2';
+    /** @var string Filter name */
+    public $name = 'Spamplemousse2';
+
+    /** @var bool Filter has settings GUI? */
     public $has_gui = true;
 
     /**
@@ -55,7 +58,6 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
     public function getStatusMessage(string $status, ?int $comment_id)
     {
         $p          = 0;
-        $con        = dcCore::app()->con;
         $spamFilter = new Bayesian();
 
         $rs = (new SelectStatement())
