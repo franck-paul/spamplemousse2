@@ -66,7 +66,7 @@ class Progress
             $this->pos       = $start;
             $this->first_run = true;
         }
-        $this->stop          = !empty($_POST['stop']) ? $_POST['stop'] : $stop;
+        $this->stop          = !empty($_POST['stop']) ? (int) $_POST['stop'] : $stop;
         $this->total_elapsed = !empty($_POST['total_elapsed']) ? (float) $_POST['total_elapsed'] : 0;
         $this->total_time    = (float) ini_get('max_execution_time') / 4;
         $this->title         = $title;
