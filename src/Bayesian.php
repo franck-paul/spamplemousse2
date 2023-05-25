@@ -333,6 +333,10 @@ class Bayesian
      */
     private function basic_train_unit(string $t, int $spam, bool $retrain = false)
     {
+        if (mb_strlen($t) > 255) {
+            $t = mb_substr($t, 0, 255);
+        }
+
         $strReq    = 'SELECT COUNT(token_nham) FROM ' . $this->table;
         $rs        = new MetaRecord($this->con->select($strReq));
         $total_ham = $rs->f(0);
