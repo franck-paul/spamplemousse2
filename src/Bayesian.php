@@ -416,7 +416,7 @@ class Bayesian
                 } elseif ($nspam == 0) {
                     $p = $this->sct_spam;
                 } else {
-                    $p = $this->compute_proba($nham, $nspam, $total_ham, $total_spam);
+                    $p = $this->compute_proba((int) $nham, (int) $nspam, (int) $total_ham, (int) $total_spam);
                     if ($p >= 1) {
                         $p = $this->sct_spam;
                     }
