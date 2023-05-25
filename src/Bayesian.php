@@ -577,7 +577,7 @@ class Bayesian
                 if ($rs->comment_status == dcBlog::COMMENT_JUNK) {
                     $spam = 1;
                 }
-                dcCore::app()->spamplemousse2_bayes->train($rs->comment_author, $rs->comment_email, $rs->comment_site, $rs->comment_ip, $rs->comment_content, $spam);
+                dcCore::app()->spamplemousse2_bayes->train((string) $rs->comment_author, (string) $rs->comment_email, (string) $rs->comment_site, (string) $rs->comment_ip, (string) $rs->comment_content, $spam);
                 $req = 'UPDATE ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
                 dcCore::app()->con->execute($req);
             }

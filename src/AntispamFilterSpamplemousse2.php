@@ -133,7 +133,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
         }
 
         if ($rsBayes->comment_bayes == 0) {
-            $spamFilter->train($author, $email, $site, $ip, $content, $spam);
+            $spamFilter->train((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
             (new UpdateStatement())
                 ->ref(dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME)
                 ->set('comment_bayes = 1')
@@ -141,7 +141,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
                 ->update()
             ;
         } else {
-            $spamFilter->retrain($author, $email, $site, $ip, $content, $spam);
+            $spamFilter->retrain((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
             $err = $rsBayes->comment_bayes_err ? 0 : 1;
             (new UpdateStatement())
                 ->ref(dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME)

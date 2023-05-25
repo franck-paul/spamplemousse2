@@ -51,7 +51,7 @@ class Url extends Tokenizer
             $result     = [];
             $url        = 'http://' . $matches[1] . $matches[8];
             $pos        = mb_strpos($str, $url);
-            $result[]   = mb_substr($str, 0, $pos);
+            $result[]   = mb_substr($str, 0, (int) $pos);
             $matched_ip = $matches[3];
             if ($matched_ip) {
                 $result[] = $matched_ip;
