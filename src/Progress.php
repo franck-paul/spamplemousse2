@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\spamplemousse2;
 
+use dcPage;
 use Dotclear\Helper\Html\XmlTag;
 use Exception;
 
@@ -113,7 +114,7 @@ class Progress
         if ($error != '') {
             $content .= '<p class="message">' . __('Error:') . ' ' . $error . '</p>';
         } else {
-            $content .= '<script type="text/javascript" src="index.php?pf=spamplemousse2/js/progress.js"></script>';
+            $content .= dcPage::jsModuleLoad(My::id() . '/js/progress.js');
 
             // display informations
             $content .= '<p>' . __('Progress:') . ' <span id="percent">' . sprintf('%d', $this->percent) . '</span> %</p>';
