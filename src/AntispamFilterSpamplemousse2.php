@@ -185,13 +185,13 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             $content .= '<p class="message">' . __('Cleanup successful.') . '</p>';
         } elseif ($action == 'oldmsg') {
             $formparams = '<input type="hidden" name="action" value="oldmsg" />';
-            $func       = [addslashes(Bayesian::class), 'feedCorpus'];
+            $func       = [Bayesian::class, 'feedCorpus'];
             $start      = 0;
             $pos        = $spamFilter->getNumLearnedComments();
             $stop       = $nb_comm;
             $inc        = 10;
             $title      = __('Learning in progress...');
-            $progress   = new Progress($title, $url, $url, $func, $start, (int) $stop, $inc, dcCore::app()->getNonce(), (int) $pos, $formparams);
+            $progress   = new Progress($title, $url, $url, $func, $start, (int) $stop, $inc, (int) $pos, $formparams);
             $content    = $progress->gui($content);
 
             return $content;

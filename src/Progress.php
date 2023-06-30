@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\spamplemousse2;
 
+use dcCore;
 use dcPage;
 use Dotclear\Helper\Html\XmlTag;
 use Exception;
@@ -36,7 +37,6 @@ class Progress
     private float $total_time;
     private float $percent = 0;
     private float $eta;
-    private string $nonce;
     private string $formparams;
 
     /**
@@ -49,13 +49,12 @@ class Progress
      * @param      int         $start       The Id of the starting point
      * @param      int         $stop        The Id of the end point
      * @param      int         $baseinc     The number of items to process on each loop
-     * @param      string      $nonce       The session token
      * @param      int         $pos         The current position (in order to resume processing)
      * @param      string      $formparams  The parameters to add to the form
      *
      * Note: the func item method must have two parameters "limit" and "offset" like in a sql query
      */
-    public function __construct(string $title, string $urlprefix, string $urlreturn, array $func, int $start, int $stop, int $baseinc, string $nonce, int $pos = 0, string $formparams = '')
+    public function __construct(string $title, string $urlprefix, string $urlreturn, array $func, int $start, int $stop, int $baseinc, int $pos = 0, string $formparams = '')
     {
         $this->start = !empty($_POST['start']) ? $_POST['start'] : $start;
         if ($_POST['pos'] != '') {
@@ -74,7 +73,6 @@ class Progress
         $this->urlprefix     = $urlprefix;
         $this->urlreturn     = $urlreturn;
         $this->formparams    = $formparams;
-        $this->nonce         = $nonce;
         $this->func          = $func;
         $this->baseinc       = $baseinc;
     }
@@ -114,7 +112,16 @@ class Progress
         if ($error != '') {
             $content .= '<p class="message">' . __('Error:') . ' ' . $error . '</p>';
         } else {
-            $content .= dcPage::jsModuleLoad(My::id() . '/js/progress.js');
+            $content .= dcPage::jsModuleLoad(My::id() . '/js/progress.js') .
+                dcPage::jsJson('spamplemousse2', [
+                    'funcClass'  => $this->func[0],
+                    'funcMethod' => $this->func[1],
+                    'pos'        => $this->pos,
+                    'start'      => $this->start,
+                    'stop'       => $this->stop,
+                    'baseInc'    => $this->baseinc,
+                ]) .
+                dcPage::jsModuleLoad(My::id() . '/js/update.js');
 
             // display informations
             $content .= '<p>' . __('Progress:') . ' <span id="percent">' . sprintf('%d', $this->percent) . '</span> %</p>';
@@ -130,17 +137,11 @@ class Progress
                         '<input type="hidden" name="start" value="' . $this->start . '" />' .
                         '<input type="hidden" name="stop" value="' . $this->stop . '" />' .
                         '<input type="hidden" name="total_elapsed" value="' . $this->total_elapsed . '" />' .
-                        '<input type="hidden" name="xd_check" value="' . $this->nonce . '" />' .
                         '<input type="submit" id="next" value="' . __('Continue') . '" />' .
+                        dcCore::app()->formNonce() .
                         '</form>';
 
             $content .= $return;
-
-            $content .= '<script type="text/javascript">' .
-                    '$(function() {' .
-                    '	$(\'#next\').hide(); ' .
-                    '	progressUpdate(\'' . $this->func[0] . '\', \'' . $this->func[1] . '\', ' . $this->pos . ', ' . $this->start . ', ' . $this->stop . ', ' . $this->baseinc . ', \'' . $this->nonce . '\');' .
-                    '});</script>';
         }
 
         return $content;
@@ -212,10 +213,6 @@ class Progress
             $funcMethod_xml = new XmlTag('funcMethod');
             $funcMethod_xml->insertNode($this->func[1]);
             $rsp->insertNode($funcMethod_xml);
-
-            $nonce_xml = new XmlTag('nonce');
-            $nonce_xml->insertNode($this->nonce);
-            $rsp->insertNode($nonce_xml);
         }
 
         return $rsp;

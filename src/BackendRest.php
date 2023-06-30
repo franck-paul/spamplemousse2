@@ -43,7 +43,7 @@ class BackendRest
         $stop       = !empty($post['stop']) ? $post['stop'] : 0;
         $baseInc    = !empty($post['baseInc']) ? $post['baseInc'] : 0;
 
-        $progress = new Progress($title, $urlprefix, $urlreturn, $func, $start, (int) $stop, (int) $baseInc, dcCore::app()->getNonce());
+        $progress = new Progress($title, $urlprefix, $urlreturn, $func, $start, (int) $stop, (int) $baseInc);
 
         return $progress->toXml();
     }
