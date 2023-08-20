@@ -15,25 +15,22 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\spamplemousse2;
 
 use dcCore;
-use dcNsProcess;
+use Dotclear\Core\Process;
 
-class Backend extends dcNsProcess
+class Backend extends Process
 {
-    protected static $init = false; /** @deprecated since 2.27 */
     public static function init(): bool
     {
-        static::$init = My::checkContext(My::BACKEND);
-
-        return static::$init;
+        return self::status(My::checkContext(My::BACKEND));
     }
 
     public static function process(): bool
     {
-        if (!static::$init) {
+        if (!self::status()) {
             return false;
         }
 
-        dcCore::app()->rest->addFunction('postProgress', [BackendRest::class, 'postProgress']);
+        dcCore::app()->rest->addFunction('postProgress', BackendRest::postProgress(...));
 
         return true;
     }

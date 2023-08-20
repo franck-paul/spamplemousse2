@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\spamplemousse2;
 
 use dcCore;
-use dcPage;
+use Dotclear\Core\Backend\Page;
 use Dotclear\Helper\Html\XmlTag;
 use Exception;
 
@@ -45,7 +45,7 @@ class Progress
      * @param      string      $title       The title of the page
      * @param      string      $urlprefix   The prefix for all urls
      * @param      string      $urlreturn   The URL for quitting the interface
-     * @param      array       $func        The Static method to call (e.g. array('class', 'method')
+     * @param      callable    $func        The Static method to call
      * @param      int         $start       The Id of the starting point
      * @param      int         $stop        The Id of the end point
      * @param      int         $baseinc     The number of items to process on each loop
@@ -54,7 +54,7 @@ class Progress
      *
      * Note: the func item method must have two parameters "limit" and "offset" like in a sql query
      */
-    public function __construct(string $title, string $urlprefix, string $urlreturn, array $func, int $start, int $stop, int $baseinc, int $pos = 0, string $formparams = '')
+    public function __construct(string $title, string $urlprefix, string $urlreturn, callable $func, int $start, int $stop, int $baseinc, int $pos = 0, string $formparams = '')
     {
         $this->start = !empty($_POST['start']) ? $_POST['start'] : $start;
         if ($_POST['pos'] != '') {
@@ -112,8 +112,8 @@ class Progress
         if ($error != '') {
             $content .= '<p class="message">' . __('Error:') . ' ' . $error . '</p>';
         } else {
-            $content .= dcPage::jsModuleLoad(My::id() . '/js/progress.js') .
-                dcPage::jsJson('spamplemousse2', [
+            $content .= My::jsLoad('progress.js') .
+                Page::jsJson('spamplemousse2', [
                     'funcClass'  => $this->func[0],
                     'funcMethod' => $this->func[1],
                     'pos'        => $this->pos,
@@ -121,7 +121,7 @@ class Progress
                     'stop'       => $this->stop,
                     'baseInc'    => $this->baseinc,
                 ]) .
-                dcPage::jsModuleLoad(My::id() . '/js/update.js');
+                My::jsLoad('update.js');
 
             // display informations
             $content .= '<p>' . __('Progress:') . ' <span id="percent">' . sprintf('%d', $this->percent) . '</span> %</p>';
