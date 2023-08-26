@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\spamplemousse2;
 
-use dcCore;
 use Dotclear\Core\Backend\Page;
 use Dotclear\Helper\Html\XmlTag;
 use Exception;
@@ -133,12 +132,13 @@ class Progress
 
             $content .= '<form action="' . $this->urlprefix . '" method="post">' .
                         $this->formparams .
-                        '<input type="hidden" name="pos" value="' . $this->pos . '" />' .
-                        '<input type="hidden" name="start" value="' . $this->start . '" />' .
-                        '<input type="hidden" name="stop" value="' . $this->stop . '" />' .
-                        '<input type="hidden" name="total_elapsed" value="' . $this->total_elapsed . '" />' .
                         '<input type="submit" id="next" value="' . __('Continue') . '" />' .
-                        dcCore::app()->formNonce() .
+                        My::parsedHiddenFields([
+                            'pos'           => $this->pos,
+                            'start'         => $this->start,
+                            'stop'          => $this->stop,
+                            'total_elapsed' => $this->total_elapsed,
+                        ]) .
                         '</form>';
 
             $content .= $return;
