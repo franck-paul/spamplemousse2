@@ -30,7 +30,11 @@ class Bayesian
 {
     public const SPAM_TOKEN_TABLE_NAME = 'spam_token';
 
+    /**
+     * @var \Dotclear\Interface\Core\ConnectionInterface
+     */
     private $con;
+
     private string $table;
     private float $val_hapax;
     private float $sct_spam;
@@ -125,7 +129,7 @@ class Bayesian
      * @param      string  $content  The comment content
      * @param      int     $spam     1 if spam
      */
-    public function train(string $author, string $email, string $site, string $ip, string $content, int $spam)
+    public function train(string $author, string $email, string $site, string $ip, string $content, int $spam): void
     {
         $tok = $this->tokenize($author, $email, $site, $ip, $content);
         if ($this->training_mode != 'TOE') {
@@ -143,7 +147,7 @@ class Bayesian
      * @param      string  $content  The comment content
      * @param      int     $spam     1 if spam
      */
-    public function retrain(string $author, string $email, string $site, string $ip, string $content, int $spam)
+    public function retrain(string $author, string $email, string $site, string $ip, string $content, int $spam): void
     {
         $tok = $this->tokenize($author, $email, $site, $ip, $content);
 
@@ -225,7 +229,7 @@ class Bayesian
      * @param      string  $m_ip       The comment author IP address
      * @param      string  $m_content  The comment content
      *
-     * @return     array   Array of tokens
+     * @return     array<string>   Array of tokens
      */
     private function tokenize(string $m_author, string $m_email, string $m_site, string $m_ip, string $m_content): array
     {
@@ -286,9 +290,9 @@ class Bayesian
     /**
      * Gives a simple array of strings from an array of tokens
      *
-     * @param      array  $tok    The Array of tokens
+     * @param      array<array<string, mixed>>  $tok    The Array of tokens
      *
-     * @return     array  Array of strings
+     * @return     array<string>  Array of strings
      */
     private function clean_tokenized_string(array $tok): array
     {
@@ -303,9 +307,9 @@ class Bayesian
     /**
      * Gets the probabilities for each token.
      *
-     * @param      array  $tok    The Array of tokens
+     * @param      array<string>  $tok    The Array of tokens
      *
-     * @return     array  The Array of probabilities.
+     * @return     array<string>  The Array of probabilities.
      */
     private function get_probabilities(array $tok): array
     {
@@ -331,7 +335,7 @@ class Bayesian
      * @param      int     $spam     1 if spam
      * @param      bool    $retrain  True if the message was already trained
      */
-    private function basic_train_unit(string $t, int $spam, bool $retrain = false)
+    private function basic_train_unit(string $t, int $spam, bool $retrain = false): void
     {
         if (mb_strlen($t) > 255) {
             $t = mb_substr($t, 0, 255);
@@ -462,11 +466,11 @@ class Bayesian
     /**
      * Basic training for a message
      *
-     * @param      array  $tok      The array of tokens
-     * @param      int    $spam     1 if spam
-     * @param      bool   $retrain  True if the message was already trained
+     * @param      array<string>    $tok      The array of tokens
+     * @param      int              $spam     1 if spam
+     * @param      bool             $retrain  True if the message was already trained
      */
-    private function basic_train(array $tok, int $spam, bool $retrain = false)
+    private function basic_train(array $tok, int $spam, bool $retrain = false): void
     {
         foreach ($tok as $t) {
             $this->basic_train_unit($t, $spam, $retrain);
@@ -530,7 +534,7 @@ class Bayesian
     /**
      * Computes the final probability of a message using Fisher-Robinson's inverse Chi-Square
      *
-     * @param      array  $proba  The array of probabilities
+     * @param      array<string>  $proba  The array of probabilities
      *
      * @return     float  The resulting probability
      */
@@ -549,6 +553,7 @@ class Bayesian
             $prod1 = 1;
             $prod2 = 1;
             foreach ($proba as $p) {
+                $p = (float) $p;
                 $prod1 *= $p;
                 $prod2 *= (1 - $p);
             }
@@ -567,7 +572,7 @@ class Bayesian
      * @param      int         $limit   The number of comments to process
      * @param      int         $offset  The number of comments to skip before processing
      */
-    public static function feedCorpus(int $limit, int $offset)
+    public static function feedCorpus(int $limit, int $offset): void
     {
         if (!isset(dcCore::app()->spamplemousse2_bayes)) {  // @phpstan-ignore-line
             dcCore::app()->spamplemousse2_bayes = new bayesian();   // @phpstan-ignore-line
@@ -591,7 +596,7 @@ class Bayesian
     /**
      * Cleans the dataset from non-pertinent tokens
      */
-    public function cleanup()
+    public function cleanup(): void
     {
         $delim = '';
         if (dcCore::app()->con->syntax() === 'postgresql') {
@@ -615,7 +620,7 @@ class Bayesian
     /**
      * Reset filter : deletes all learned data
      */
-    public function resetFilter()
+    public function resetFilter(): void
     {
         $req = 'UPDATE ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME . ' SET comment_bayes = 0, comment_bayes_err = 0';
         dcCore::app()->con->execute($req);
@@ -628,7 +633,7 @@ class Bayesian
      *
      * @return     int  The number learned comments.
      */
-    public function getNumLearnedComments()
+    public function getNumLearnedComments(): int
     {
         $result = 0;
         $req    = 'SELECT COUNT(comment_id) FROM ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
@@ -645,7 +650,7 @@ class Bayesian
      *
      * @return     int  The number of wrongly classified comments.
      */
-    public function getNumErrorComments()
+    public function getNumErrorComments(): int
     {
         $result = 0;
         $req    = 'SELECT COUNT(comment_id) FROM ' . dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
@@ -662,7 +667,7 @@ class Bayesian
      *
      * @return     int  The number learned tokens.
      */
-    public function getNumLearnedTokens()
+    public function getNumLearnedTokens(): int
     {
         $result = 0;
         $req    = 'SELECT COUNT(token_id) FROM ' . $this->table;

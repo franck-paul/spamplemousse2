@@ -29,9 +29,9 @@ class Url extends Tokenizer
      *
      * @param      string            $str    The string
      *
-     * @return     array|int|string     Array of strings, containing : (left string, match1, match2, ..., right string)
+     * @return     array<string>|int|string     Array of strings, containing : (left string, match1, match2, ..., right string)
      */
-    protected function match($str)
+    protected function match(string $str)
     {
         $result  = [];
         $matches = '';

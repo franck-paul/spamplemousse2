@@ -25,9 +25,9 @@ class BackendRest
     /**
      * Posts a progress.
      *
-     * @param      dcCore  $core   The core
-     * @param      array   $get    The get parameters
-     * @param      array   $post   The post parameters
+     * @param      dcCore                   $core   The core
+     * @param      array<string, string>    $get    The get parameters
+     * @param      array<string, string>    $post   The post parameters
      *
      * @return     XmlTag  The xml message.
      */

@@ -31,15 +31,15 @@ use Dotclear\Plugin\antispam\SpamFilter;
 class AntispamFilterSpamplemousse2 extends SpamFilter
 {
     /** @var string Filter name */
-    public $name = 'Spamplemousse2';
+    public string $name = 'Spamplemousse2';
 
     /** @var bool Filter has settings GUI? */
-    public $has_gui = true;
+    public bool $has_gui = true;
 
     /**
      * Sets the filter description.
      */
-    protected function setInfo()
+    protected function setInfo(): void
     {
         $this->description = __('A bayesian filter');
     }
@@ -54,7 +54,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
      *
      * @return     string  The status message.
      */
-    public function getStatusMessage(string $status, ?int $comment_id)
+    public function getStatusMessage(string $status, ?int $comment_id): string
     {
         $p          = 0;
         $spamFilter = new Bayesian();
@@ -274,7 +274,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
      * @param      Cursor  $cur    The cursor on the comment
      * @param      int     $id     The identifier of the comment
      */
-    public static function toggleLearnedFlag(Cursor $cur, int $id)
+    public static function toggleLearnedFlag(Cursor $cur, int $id): void
     {
         if (isset(dcCore::app()->spamplemousse2_learned) && dcCore::app()->spamplemousse2_learned == 1) {   // @phpstan-ignore-line
             (new UpdateStatement())

@@ -26,7 +26,12 @@ class Progress
     private string $title;
     private string $urlprefix;
     private string $urlreturn;
-    private array $func;
+
+    /**
+     * @var callable
+     */
+    private $func;
+
     private int $start;
     private int $stop;
     private int $baseinc;
@@ -221,7 +226,7 @@ class Progress
     /**
      * Call the given method
      */
-    private function compute()
+    private function compute(): void
     {
         $elapsed = 0;
         do {

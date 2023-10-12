@@ -29,7 +29,7 @@ abstract class Tokenizer
      *
      * @param      string            $str    The string
      *
-     * @return     array|int|string     Array of strings, containing : (left string, match1, match2, ..., right string)
+     * @return     array<string>|int|string     Array of strings, containing : (left string, match1, match2, ..., right string)
      */
     abstract protected function match(string $str);
 
@@ -40,7 +40,7 @@ abstract class Tokenizer
      * @param      string  $prefix  The prefix associated to the $elem string
      * @param      bool    $final   The final state of the token
      *
-     * @return     array|null   The element of the token array
+     * @return     array<string, mixed>|null   The element of the token array
      */
     public function create_token(string $elem, string $prefix, bool $final = false)
     {
@@ -64,9 +64,9 @@ abstract class Tokenizer
     /**
      * Tokenizes strings not finalized in an array of token, based on a specified matching method
      *
-     * @param      array  $t      Array of tokens
+     * @param      array<array<string, mixed>>  $t      Array of tokens
      *
-     * @return     array  Array of tokens
+     * @return     array<array<string, mixed>>  Array of tokens
      */
     public function tokenize(array $t): array
     {
@@ -125,18 +125,18 @@ abstract class Tokenizer
             }
         }
 
-        return($tab);
+        return $tab;
     }
 
     /**
      * Default tokenization of a string, based on a fixed list of delimiters
      *
-     * @param      array  $t        Array of tokens
-     * @param      string $prefix   The prefix to add to the new tokens
-     * @param      string $type     The result type : 'token' or 'string', returns an array of tokens or an array of string (like match_url)
-     * @param      string $delim    List of delimiters to use for the tokenization
+     * @param      array<array<string, mixed>>  $t        Array of tokens
+     * @param      string                       $prefix   The prefix to add to the new tokens
+     * @param      string                       $type     The result type : 'token' or 'string', returns an array of tokens or an array of string (like match_url)
+     * @param      string                       $delim    List of delimiters to use for the tokenization
      *
-     * @return     array  Array of tokens or array of strings
+     * @return     array<array<string, mixed>>|array<string>  Array of tokens or array of strings
      */
     public function default_tokenize(array $t, string $prefix = '', string $type = 'token', string $delim = ''): array
     {

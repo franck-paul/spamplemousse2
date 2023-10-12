@@ -29,7 +29,7 @@ class Email extends Tokenizer
      *
      * @param      string            $str    The string to analyze
      *
-     * @return     array|int|string  Array of strings, containing : (left string, match1, match2, ..., right string)
+     * @return     array<string>|int|string  Array of strings, containing : (left string, match1, match2, ..., right string)
      */
     protected function match(string $str)
     {
