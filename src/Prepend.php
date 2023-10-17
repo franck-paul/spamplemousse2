@@ -14,7 +14,9 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\spamplemousse2;
 
+use ArrayObject;
 use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Process;
 
 class Prepend extends Process
@@ -30,7 +32,11 @@ class Prepend extends Process
             return false;
         }
 
-        dcCore::app()->spamfilters[] = AntispamFilterSpamplemousse2::class;
+        App::behavior()->addBehaviors([
+            'AntispamInitFilters' => function (ArrayObject $spamfilters): void {
+                $spamfilters->append(AntispamFilterSpamplemousse2::class);
+            },
+        ]);
 
         if (dcCore::app()->plugins->moduleExists('Uninstaller')) {
             // Add cleaners to Uninstaller

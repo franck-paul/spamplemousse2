@@ -16,7 +16,7 @@ $this->registerModule(
     'Alain Vagner and contributors',
     '5.0',
     [
-        'requires'    => [['core', '2.27'], ['php', '8.1']],
+        'requires'    => [['core', '2.28']],
         'type'        => 'plugin',
         'priority'    => 100,
         'permissions' => dcCore::app()->auth->makePermissions([
