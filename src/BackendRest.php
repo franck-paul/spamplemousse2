@@ -36,14 +36,14 @@ class BackendRest
         $title      = '';
         $urlprefix  = '';
         $urlreturn  = '1';
-        $funcClass  = !empty($post['funcClass']) ? $post['funcClass'] : null;
-        $funcMethod = !empty($post['funcMethod']) ? $post['funcMethod'] : null;
+        $funcClass  = !empty($post['funcClass']) ? $post['funcClass'] : '';
+        $funcMethod = !empty($post['funcMethod']) ? $post['funcMethod'] : '';
         $func       = [$funcClass, $funcMethod];
         $start      = !empty($post['start']) ? $post['start'] : 0;
         $stop       = !empty($post['stop']) ? $post['stop'] : 0;
         $baseInc    = !empty($post['baseInc']) ? $post['baseInc'] : 0;
 
-        $progress = new Progress($title, $urlprefix, $urlreturn, $func, $start, (int) $stop, (int) $baseInc);
+        $progress = new Progress($title, $urlprefix, $urlreturn, $func, (int) $start, (int) $stop, (int) $baseInc);
 
         return $progress->toXml();
     }

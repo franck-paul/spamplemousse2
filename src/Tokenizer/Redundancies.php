@@ -36,7 +36,7 @@ class Redundancies extends Tokenizer
             $result   = [];
             $word     = $matches[1];
             $pos      = mb_strpos($str, $word);
-            $result[] = mb_substr($str, 0, $pos);
+            $result[] = mb_substr($str, 0, (int) $pos);
             $result[] = $word;
             $result[] = $matches[3];
         } else {

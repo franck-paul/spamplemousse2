@@ -29,7 +29,7 @@ class Url extends Tokenizer
      *
      * @param      string            $str    The string
      *
-     * @return     array<string>|int|string     Array of strings, containing : (left string, match1, match2, ..., right string)
+     * @return     array<string>|int     Array of strings, containing : (left string, match1, match2, ..., right string)
      */
     protected function match(string $str)
     {
@@ -66,6 +66,6 @@ class Url extends Tokenizer
             $result = 0;
         }
 
-        return $result;
+        return $result; // @phpstan-ignore-line
     }
 }

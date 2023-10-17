@@ -189,7 +189,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             $stop       = $nb_comm;
             $inc        = 10;
             $title      = __('Learning in progress...');
-            $progress   = new Progress($title, $url, $url, Bayesian::feedCorpus(...), $start, (int) $stop, $inc, (int) $pos, $formparams);
+            $progress   = new Progress($title, $url, $url, ['Bayesian', 'feedCorpus'], $start, (int) $stop, $inc, (int) $pos, $formparams);
             $content    = $progress->gui($content);
 
             return $content;

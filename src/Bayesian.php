@@ -282,7 +282,7 @@ class Bayesian
 
         # result
         $tok = array_merge($nom, $mail, $site, $ip, $contenu);
-        $tok = $this->clean_tokenized_string($tok);
+        $tok = $this->clean_tokenized_string($tok); // @phpstan-ignore-line
 
         return $tok;
     }
@@ -317,7 +317,7 @@ class Bayesian
 
         foreach ($tok as $i) {
             $p      = $this->val_hapax;
-            $strReq = 'SELECT token_nham, token_nspam, token_p FROM ' . $this->table . ' WHERE token_id = \'' . $this->con->escape($i) . '\'';
+            $strReq = 'SELECT token_nham, token_nspam, token_p FROM ' . $this->table . ' WHERE token_id = \'' . $this->con->escapeStr($i) . '\'';
             $rs     = new MetaRecord($this->con->select($strReq));
             if (!$rs->isEmpty()) {
                 $p = $rs->token_p;
@@ -353,7 +353,7 @@ class Bayesian
         $known_token = false;
 
         # we determine if the token is already in the dataset
-        $strReq = 'SELECT token_nham, token_nspam, token_p, token_mature FROM ' . $this->table . ' WHERE token_id = \'' . $this->con->escape($t) . '\'';
+        $strReq = 'SELECT token_nham, token_nspam, token_p, token_mature FROM ' . $this->table . ' WHERE token_id = \'' . $this->con->escapeStr($t) . '\'';
         $rs     = new MetaRecord($this->con->select($strReq));
 
         if (!$rs->isEmpty()) {
@@ -437,12 +437,12 @@ class Bayesian
                     $maturity = ($nr >= $this->tum_maturity) ? 1 : 0;
                     $strReq   = 'UPDATE ' . $this->table . ' SET token_nham=' . $nham . ', token_nspam=' .
                             $nspam . ', token_mdate=\'' . date('Y-m-d H:i:s') . '\', token_p=\'' .
-                            $p . '\', token_mature=\'' . $maturity . '\' WHERE token_id=\'' . $this->con->escape($token['token_id']) . '\'';
+                            $p . '\', token_mature=\'' . $maturity . '\' WHERE token_id=\'' . $this->con->escapeStr($token['token_id']) . '\'';
                     $this->con->execute($strReq);
                 } else {
                     $strReq = 'UPDATE ' . $this->table . ' SET token_nham=' . $nham . ', token_nspam=' .
                             $nspam . ', token_mdate=\'' . date('Y-m-d H:i:s') . '\', token_p=\'' .
-                            $p . '\' WHERE token_id=\'' . $this->con->escape($token['token_id']) . '\'';
+                            $p . '\' WHERE token_id=\'' . $this->con->escapeStr($token['token_id']) . '\'';
                     $this->con->execute($strReq);
                 }
             }
@@ -458,7 +458,7 @@ class Bayesian
                 $nham = 1;
             }
             $p      = $this->val_hapax;
-            $strReq = 'INSERT INTO ' . $this->table . ' (token_id, token_nham, token_nspam, token_mdate, token_p) VALUES (\'' . $this->con->escape($t) . '\',' . $nham . ',' . $nspam . ',\'' . date('Y-m-d H:i:s') . '\' ,\'' . $p . '\')';
+            $strReq = 'INSERT INTO ' . $this->table . ' (token_id, token_nham, token_nspam, token_mdate, token_p) VALUES (\'' . $this->con->escapeStr($t) . '\',' . $nham . ',' . $nspam . ',\'' . date('Y-m-d H:i:s') . '\' ,\'' . $p . '\')';
             $this->con->execute($strReq);
         }
     }

@@ -48,7 +48,7 @@ class Email extends Tokenizer
 
             $mail     = $matches[1] . '@' . $matches[2];
             $pos      = mb_strpos($str, $mail);
-            $result[] = mb_substr($str, 0, $pos);
+            $result[] = mb_substr($str, 0, (int) $pos);
             $result[] = $matches[1];
             $result   = array_merge($result, explode('.', $matches[2]));
             $result[] = $matches[3];

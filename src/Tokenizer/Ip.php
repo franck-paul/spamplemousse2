@@ -41,7 +41,7 @@ class Ip extends Tokenizer
             $result   = [];
             $ip       = $matches[1] . '.' . $matches[2] . '.' . $matches[3] . '.' . $matches[4];
             $pos      = mb_strpos($str, $ip . $matches[5]);
-            $result[] = mb_substr($str, 0, $pos);
+            $result[] = mb_substr($str, 0, (int) $pos);
             $result[] = $ip;
             $result[] = $matches[5];
         } else {

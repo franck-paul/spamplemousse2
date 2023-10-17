@@ -28,7 +28,7 @@ class Progress
     private string $urlreturn;
 
     /**
-     * @var callable
+     * @var array{0:string, 1:string}
      */
     private $func;
 
@@ -46,19 +46,19 @@ class Progress
     /**
      * Constructs a new instance.
      *
-     * @param      string      $title       The title of the page
-     * @param      string      $urlprefix   The prefix for all urls
-     * @param      string      $urlreturn   The URL for quitting the interface
-     * @param      callable    $func        The Static method to call
-     * @param      int         $start       The Id of the starting point
-     * @param      int         $stop        The Id of the end point
-     * @param      int         $baseinc     The number of items to process on each loop
-     * @param      int         $pos         The current position (in order to resume processing)
-     * @param      string      $formparams  The parameters to add to the form
+     * @param      string                       $title       The title of the page
+     * @param      string                       $urlprefix   The prefix for all urls
+     * @param      string                       $urlreturn   The URL for quitting the interface
+     * @param      array{0:string, 1:string}    $func        The Static method to call
+     * @param      int                          $start       The Id of the starting point
+     * @param      int                          $stop        The Id of the end point
+     * @param      int                          $baseinc     The number of items to process on each loop
+     * @param      int                          $pos         The current position (in order to resume processing)
+     * @param      string                       $formparams  The parameters to add to the form
      *
      * Note: the func item method must have two parameters "limit" and "offset" like in a sql query
      */
-    public function __construct(string $title, string $urlprefix, string $urlreturn, callable $func, int $start, int $stop, int $baseinc, int $pos = 0, string $formparams = '')
+    public function __construct(string $title, string $urlprefix, string $urlreturn, array $func, int $start, int $stop, int $baseinc, int $pos = 0, string $formparams = '')
     {
         $this->start = !empty($_POST['start']) ? $_POST['start'] : $start;
         if ($_POST['pos'] != '') {
@@ -142,7 +142,7 @@ class Progress
                             'pos'           => $this->pos,
                             'start'         => $this->start,
                             'stop'          => $this->stop,
-                            'total_elapsed' => $this->total_elapsed,
+                            'total_elapsed' => (string) $this->total_elapsed,
                         ]) .
                         '</form>';
 
@@ -239,7 +239,7 @@ class Progress
             $loopParams[] = $this->pos;
             $this->pos    = $end;
             $tstart       = microtime(true);
-            call_user_func_array($this->func, $loopParams);
+            call_user_func_array($this->func, $loopParams); // @phpstan-ignore-line
             $tend = microtime(true);
             $elapsed += $tend - $tstart;
         } while (($elapsed < $this->total_time) && ($this->pos < $this->stop));

@@ -48,7 +48,7 @@ class Reassembly extends Tokenizer
                     $word .= $word_tmp[$i];
                 }
                 $pos      = mb_strpos($str, $word_tmp);
-                $result[] = mb_substr($str, 0, $pos);
+                $result[] = mb_substr($str, 0, (int) $pos);
                 $result[] = $word;
                 $result[] = $matches[3];
             } else {
