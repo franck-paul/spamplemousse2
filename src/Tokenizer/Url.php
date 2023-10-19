@@ -56,12 +56,16 @@ class Url extends Tokenizer
             if ($matched_ip) {
                 $result[] = $matched_ip;
             } else { // we matched a domain name
-                $tok    = $this->create_token($matches[2], '');
-                $result = array_merge($result, $this->default_tokenize([$tok], '', 'string', '.'));
+                $tok = $this->create_token($matches[2], '');
+                if (!is_null($tok)) {
+                    $result = array_merge($result, $this->default_tokenize([$tok], '', 'string', '.'));
+                }
             }
-            $tok      = $this->create_token($matches[8], '');
-            $result   = array_merge($result, $this->default_tokenize([$tok], '', 'string', '/?=.:&'));
-            $result[] = $matches[9];
+            $tok = $this->create_token($matches[8], '');
+            if (!is_null($tok)) {
+                $result   = array_merge($result, $this->default_tokenize([$tok], '', 'string', '/?=.:&'));
+                $result[] = $matches[9];
+            }
         } else {
             $result = 0;
         }

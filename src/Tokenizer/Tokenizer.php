@@ -29,7 +29,7 @@ abstract class Tokenizer
      *
      * @param      string            $str    The string
      *
-     * @return     array<string>|int|string     Array of strings, containing : (left string, match1, match2, ..., right string)
+     * @return     array<int, string>|int|string     Array of strings, containing : (left string, match1, match2, ..., right string)
      */
     abstract protected function match(string $str);
 
@@ -64,9 +64,9 @@ abstract class Tokenizer
     /**
      * Tokenizes strings not finalized in an array of token, based on a specified matching method
      *
-     * @param      array<array<string, mixed>>  $t      Array of tokens
+     * @param      array<int, array<string, mixed>>  $t      Array of tokens
      *
-     * @return     array<array<string, mixed>>  Array of tokens
+     * @return     array<int, array<string, mixed>>  Array of tokens
      */
     public function tokenize(array $t): array
     {
@@ -89,7 +89,9 @@ abstract class Tokenizer
                             $matches[0] = trim((string) $matches[0]);
                             # part of the string left to the found tokens
                             if ($matches[0] != '') {
-                                $cur[] = $this->create_token($matches[0], $pre, false);
+                                if (!is_null($new_token = $this->create_token($matches[0], $pre, false))) {
+                                    $cur[] = $new_token;
+                                }
                             }
 
                             # matched tokens handling
@@ -102,7 +104,9 @@ abstract class Tokenizer
                                 } else {
                                     $p = $pre . $this->prefix;
                                 }
-                                $cur[] = $this->create_token($matches[$i], $p, true);
+                                if (!is_null($new_token = $this->create_token($matches[$i], $p, true))) {
+                                    $cur[] = $new_token;
+                                }
                                 $i++;
                             }
 
@@ -113,7 +117,9 @@ abstract class Tokenizer
                             # part of the string right to the found tokens
                             $remain = trim($remain);
                             if ($remain != '') {
-                                $cur[]  = $this->create_token($remain, $pre, false);
+                                if (!is_null($new_token = $this->create_token($remain, $pre, false))) {
+                                    $cur[] = $new_token;
+                                }
                                 $remain = '';
                             }
                         }
@@ -131,10 +137,11 @@ abstract class Tokenizer
     /**
      * Default tokenization of a string, based on a fixed list of delimiters
      *
-     * @param      array<array<string, mixed>>  $t        Array of tokens
-     * @param      string                       $prefix   The prefix to add to the new tokens
-     * @param      string                       $type     The result type : 'token' or 'string', returns an array of tokens or an array of string (like match_url)
-     * @param      string                       $delim    List of delimiters to use for the tokenization
+     * @param      array<int, array<string, mixed>>     $t        Array of tokens
+     * @param      string                               $prefix   The prefix to add to the new tokens
+     * @param      string                               $type     The result type : 'token' or 'string', returns an array of tokens
+     *                                                            or an array of string (like match_url)
+     * @param      string                               $delim    List of delimiters to use for the tokenization
      *
      * @return     array<array<string, mixed>>|array<string>  Array of tokens or array of strings
      */
@@ -178,7 +185,7 @@ abstract class Tokenizer
                     # handling of the last word
                     if (!((mb_strpos($delim, mb_substr($s, $j, 1)) !== false) && (mb_substr($s, $j, 1) == ' '))) {
                         $sub = mb_substr($s, $i, $j - $i + 1);
-                        if ($sub != '') {
+                        if ($sub !== '') {
                             if ($type == 'token') {
                                 $p = ''; # new prefix
                                 if (!empty($pre) && !empty($prefix)) {
@@ -186,7 +193,9 @@ abstract class Tokenizer
                                 } else {
                                     $p = $pre . $prefix;
                                 }
-                                $tab[] = $this->create_token($sub, $p, true);
+                                if (!is_null($new_token = $this->create_token($sub, $p, true))) {
+                                    $tab[] = $new_token;
+                                }
                             } else {
                                 $tab[] = $sub;
                             }

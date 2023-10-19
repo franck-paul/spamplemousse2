@@ -16,6 +16,7 @@ namespace Dotclear\Plugin\spamplemousse2;
 
 use dcBlog;
 use dcCore;
+use Dotclear\App;
 use Dotclear\Database\Cursor;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Database\Statement\SelectStatement;
@@ -61,13 +62,16 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
 
         $rs = (new SelectStatement())
             ->columns(['comment_author', 'comment_email', 'comment_site', 'comment_ip', 'comment_content'])
-            ->from(dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME)
+            ->from(App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME)
             ->where('comment_id = ' . $comment_id)
             ->select()
         ;
-        $rs->fetch();
 
-        $p = $spamFilter->getMsgProba($rs->comment_author, $rs->comment_email, $rs->comment_site, $rs->comment_ip, $rs->comment_content);
+        if ($rs) {
+            $rs->fetch();
+            $p = $spamFilter->getMsgProba($rs->comment_author, $rs->comment_email, $rs->comment_site, $rs->comment_ip, $rs->comment_content);
+        }
+
         $p = round($p * 100);
 
         return sprintf(__('Filtered by %s, actual spamminess: %s %%'), $this->guiLink(), $p);
@@ -93,7 +97,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
     public function isSpam(string $type, ?string $author, ?string $email, ?string $site, ?string $ip, ?string $content, ?int $post_id, string &$status)
     {
         $spamFilter = new Bayesian();
-        $spam       = $spamFilter->handle_new_message($author, $email, $site, $ip, $content);
+        $spam       = $spamFilter->handle_new_message((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content);
         if ($spam) {
             $status = '';
         }
@@ -120,34 +124,36 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
 
         $rsBayes = (new SelectStatement())
             ->fields(['comment_bayes', 'comment_bayes_err'])
-            ->from(dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME)
+            ->from(App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME)
             ->where('comment_id = ' . $rs->comment_id)
             ->select();
 
-        $rsBayes->fetch();
+        if ($rsBayes) {
+            $rsBayes->fetch();
 
-        $spam = 0;
-        if ($status == 'spam') { # the current action marks the comment as spam
-            $spam = 1;
-        }
+            $spam = 0;
+            if ($status == 'spam') { # the current action marks the comment as spam
+                $spam = 1;
+            }
 
-        if ($rsBayes->comment_bayes == 0) {
-            $spamFilter->train((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
-            (new UpdateStatement())
-                ->ref(dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME)
-                ->set('comment_bayes = 1')
-                ->where('comment_id = ' . $rs->comment_id)
-                ->update()
-            ;
-        } else {
-            $spamFilter->retrain((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
-            $err = $rsBayes->comment_bayes_err ? 0 : 1;
-            (new UpdateStatement())
-                ->ref(dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME)
-                ->set('comment_bayes_err = ' . $err)
-                ->where('comment_id = ' . $rs->comment_id)
-                ->update()
-            ;
+            if ($rsBayes->comment_bayes == 0) {
+                $spamFilter->train((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
+                (new UpdateStatement())
+                    ->ref(App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME)
+                    ->set('comment_bayes = 1')
+                    ->where('comment_id = ' . $rs->comment_id)
+                    ->update()
+                ;
+            } else {
+                $spamFilter->retrain((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
+                $err = $rsBayes->comment_bayes_err ? 0 : 1;
+                (new UpdateStatement())
+                    ->ref(App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME)
+                    ->set('comment_bayes_err = ' . $err)
+                    ->where('comment_id = ' . $rs->comment_id)
+                    ->update()
+                ;
+            }
         }
     }
 
@@ -170,10 +176,10 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
         $sql     = new SelectStatement();
         $sql
             ->column($sql->count('comment_id'))
-            ->from(dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME)
+            ->from(App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME)
         ;
         $rs = $sql->select();
-        if ($rs->fetch()) {
+        if ($rs && $rs->fetch()) {
             $nb_comm = $rs->f(0);
         }
         $learned = 0;
@@ -278,7 +284,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
     {
         if (isset(dcCore::app()->spamplemousse2_learned) && dcCore::app()->spamplemousse2_learned == 1) {   // @phpstan-ignore-line
             (new UpdateStatement())
-                ->ref(dcCore::app()->blog->prefix . dcBlog::COMMENT_TABLE_NAME)
+                ->ref(App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME)
                 ->set('comment_bayes = 1')
                 ->where('comment_id = ' . $id)
                 ->update()
