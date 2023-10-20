@@ -40,7 +40,7 @@ class Progress
     private float $total_elapsed;
     private float $total_time;
     private float $percent = 0;
-    private float $eta;
+    private float $eta     = 0;
     private string $formparams;
 
     /**
