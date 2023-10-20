@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\spamplemousse2;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Process;
 
 class Frontend extends Process
@@ -30,7 +30,7 @@ class Frontend extends Process
             return false;
         }
 
-        dcCore::app()->addBehaviors([
+        App::behavior()->addBehaviors([
             'publicAfterCommentCreate'   => AntispamFilterSpamplemousse2::toggleLearnedFlag(...),
             'publicAfterTrackbackCreate' => AntispamFilterSpamplemousse2::toggleLearnedFlag(...),
         ]);

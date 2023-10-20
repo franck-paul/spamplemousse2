@@ -14,10 +14,9 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\spamplemousse2;
 
-use dcBlog;
-use dcCore;
 use Dotclear\App;
 use Dotclear\Database\MetaRecord;
+use Dotclear\Interface\Core\BlogInterface;
 use Dotclear\Plugin\spamplemousse2\Tokenizer\Email;
 use Dotclear\Plugin\spamplemousse2\Tokenizer\Ip;
 use Dotclear\Plugin\spamplemousse2\Tokenizer\Reassembly;
@@ -47,8 +46,8 @@ class Bayesian
 
     public function __construct()
     {
-        $this->con   = dcCore::app()->con;
-        $this->table = dcCore::app()->prefix . self::SPAM_TOKEN_TABLE_NAME;
+        $this->con   = App::con();
+        $this->table = App::con()->prefix() . self::SPAM_TOKEN_TABLE_NAME;
 
         # all parameters
         $this->val_hapax     = 0.45; # hapaxial value
@@ -107,7 +106,11 @@ class Bayesian
         }
         if ($this->training_mode != 'TOE') {
             $this->basic_train($tok, $spam);
-            dcCore::app()->spamplemousse2_learned = 1;  // @phpstan-ignore-line
+            if (App::task()->checkContext('FRONTEND')) {
+                App::frontend()->spamplemousse2_learned = 1;    // @phpstan-ignore-line
+            } else {
+                App::backend()->spamplemousse2_learned = 1;
+            }
         }
 
         $result = null;
@@ -575,21 +578,29 @@ class Bayesian
      */
     public static function feedCorpus(int $limit, int $offset): void
     {
-        if (!isset(dcCore::app()->spamplemousse2_bayes)) {  // @phpstan-ignore-line
-            dcCore::app()->spamplemousse2_bayes = new bayesian();   // @phpstan-ignore-line
+        if (App::task()->checkContext('FRONTEND')) {
+            if (!isset(App::frontend()->spamplemousse2_bayes)) {
+                App::frontend()->spamplemousse2_bayes = new Bayesian(); // @phpstan-ignore-line
+            }
+            $bayes = App::frontend()->spamplemousse2_bayes;
+        } else {
+            if (!isset(App::backend()->spamplemousse2_bayes)) {
+                App::backend()->spamplemousse2_bayes = new Bayesian();
+            }
+            $bayes = App::backend()->spamplemousse2_bayes;
         }
 
-        $rs = new MetaRecord(dcCore::app()->con->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . (string) $limit . ' OFFSET ' . (string) $offset));
+        $rs = new MetaRecord(App::con()->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . (string) $limit . ' OFFSET ' . (string) $offset));
 
         while ($rs->fetch()) {
             if ($rs->comment_bayes == 0) {
                 $spam = 0;
-                if ($rs->comment_status == dcBlog::COMMENT_JUNK) {
+                if ($rs->comment_status == BlogInterface::COMMENT_JUNK) {
                     $spam = 1;
                 }
-                dcCore::app()->spamplemousse2_bayes->train((string) $rs->comment_author, (string) $rs->comment_email, (string) $rs->comment_site, (string) $rs->comment_ip, (string) $rs->comment_content, $spam);
-                $req = 'UPDATE ' . App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
-                dcCore::app()->con->execute($req);
+                $bayes->train((string) $rs->comment_author, (string) $rs->comment_email, (string) $rs->comment_site, (string) $rs->comment_ip, (string) $rs->comment_content, $spam);
+                $req = 'UPDATE ' . App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
+                App::con()->execute($req);
             }
         }
     }
@@ -600,21 +611,21 @@ class Bayesian
     public function cleanup(): void
     {
         $delim = '';
-        if (dcCore::app()->con->syntax() === 'postgresql') {
+        if (App::con()->syntax() === 'postgresql') {
             $delim = '\'';
         }
         # delete data stale for 6 months
         $req = 'DELETE FROM ' . $this->table . ' WHERE (NOW() - INTERVAL ' . $delim . '6 MONTH' . $delim . ') > token_mdate';
-        dcCore::app()->con->execute($req);
+        App::con()->execute($req);
 
         # delete all hapaxes stale for 15 days
         $req = 'DELETE FROM ' . $this->table . ' WHERE  (token_nham +2 * token_nspam ) < 5 AND (NOW() - INTERVAL ' . $delim . '15 DAY' . $delim . ') > token_mdate';
-        dcCore::app()->con->execute($req);
+        App::con()->execute($req);
 
         # if in TUM mode, delete all matured data between 0.3 and 0.7
         if ($this->training_mode == 'TUM') {
             $req = 'DELETE FROM ' . $this->table . ' WHERE token_p > 0.3 AND token_p < 0.7 AND token_mature = 1';
-            dcCore::app()->con->execute($req);
+            App::con()->execute($req);
         }
     }
 
@@ -623,10 +634,10 @@ class Bayesian
      */
     public function resetFilter(): void
     {
-        $req = 'UPDATE ' . App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME . ' SET comment_bayes = 0, comment_bayes_err = 0';
-        dcCore::app()->con->execute($req);
+        $req = 'UPDATE ' . App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME . ' SET comment_bayes = 0, comment_bayes_err = 0';
+        App::con()->execute($req);
         $req = 'DELETE FROM ' . $this->table;
-        dcCore::app()->con->execute($req);
+        App::con()->execute($req);
     }
 
     /**
@@ -637,7 +648,7 @@ class Bayesian
     public function getNumLearnedComments(): int
     {
         $result = 0;
-        $req    = 'SELECT COUNT(comment_id) FROM ' . App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
+        $req    = 'SELECT COUNT(comment_id) FROM ' . App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
         $rs     = new MetaRecord($this->con->select($req));
         if ($rs->fetch()) {
             $result = $rs->f(0);
@@ -654,7 +665,7 @@ class Bayesian
     public function getNumErrorComments(): int
     {
         $result = 0;
-        $req    = 'SELECT COUNT(comment_id) FROM ' . App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
+        $req    = 'SELECT COUNT(comment_id) FROM ' . App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
         $rs     = new MetaRecord($this->con->select($req));
         if ($rs->fetch()) {
             $result = $rs->f(0);

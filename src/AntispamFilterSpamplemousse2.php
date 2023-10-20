@@ -14,8 +14,6 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\spamplemousse2;
 
-use dcBlog;
-use dcCore;
 use Dotclear\App;
 use Dotclear\Database\Cursor;
 use Dotclear\Database\MetaRecord;
@@ -24,6 +22,7 @@ use Dotclear\Database\Statement\UpdateStatement;
 use Dotclear\Helper\Html\Form\Form;
 use Dotclear\Helper\Html\Form\Para;
 use Dotclear\Helper\Html\Form\Submit;
+use Dotclear\Interface\Core\BlogInterface;
 use Dotclear\Plugin\antispam\SpamFilter;
 
 /**
@@ -62,7 +61,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
 
         $rs = (new SelectStatement())
             ->columns(['comment_author', 'comment_email', 'comment_site', 'comment_ip', 'comment_content'])
-            ->from(App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME)
+            ->from(App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME)
             ->where('comment_id = ' . $comment_id)
             ->select()
         ;
@@ -124,7 +123,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
 
         $rsBayes = (new SelectStatement())
             ->fields(['comment_bayes', 'comment_bayes_err'])
-            ->from(App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME)
+            ->from(App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME)
             ->where('comment_id = ' . $rs->comment_id)
             ->select();
 
@@ -139,7 +138,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             if ($rsBayes->comment_bayes == 0) {
                 $spamFilter->train((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
                 (new UpdateStatement())
-                    ->ref(App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME)
+                    ->ref(App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME)
                     ->set('comment_bayes = 1')
                     ->where('comment_id = ' . $rs->comment_id)
                     ->update()
@@ -148,7 +147,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
                 $spamFilter->retrain((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
                 $err = $rsBayes->comment_bayes_err ? 0 : 1;
                 (new UpdateStatement())
-                    ->ref(App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME)
+                    ->ref(App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME)
                     ->set('comment_bayes_err = ' . $err)
                     ->where('comment_id = ' . $rs->comment_id)
                     ->update()
@@ -176,7 +175,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
         $sql     = new SelectStatement();
         $sql
             ->column($sql->count('comment_id'))
-            ->from(App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME)
+            ->from(App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME)
         ;
         $rs = $sql->select();
         if ($rs && $rs->fetch()) {
@@ -273,18 +272,25 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
      * When a comment passes through the isSpam method of this filter for the first
      * time, it is possible that the filter learns from this message, but in isSpam
      * we are too early in the filtering process to be able to toggle the flag. So
-     * we set the global dcCore::app()->spamplemousse2_learned to 1, and when the process comes to
-     * its end, this method is triggered (by the events publicAfterCommentCreate and
-     * publicAfterTrackbackCreate), and we update the flag in the database.
+     * we set the global App::backend()/frontend()->spamplemousse2_learned to 1,
+     * and when the process comes to its end, this method is triggered (by the events
+     * publicAfterCommentCreate and publicAfterTrackbackCreate), and we update the
+     * flag in the database.
      *
      * @param      Cursor  $cur    The cursor on the comment
      * @param      int     $id     The identifier of the comment
      */
     public static function toggleLearnedFlag(Cursor $cur, int $id): void
     {
-        if (isset(dcCore::app()->spamplemousse2_learned) && dcCore::app()->spamplemousse2_learned == 1) {   // @phpstan-ignore-line
+        if (App::task()->checkContext('FRONTEND')) {
+            $learned = App::frontend()->spamplemousse2_learned; // @phpstan-ignore-line
+        } else {
+            $learned = App::backend()->spamplemousse2_learned;
+        }
+
+        if ($learned === 1) {
             (new UpdateStatement())
-                ->ref(App::con()->prefix() . dcBlog::COMMENT_TABLE_NAME)
+                ->ref(App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME)
                 ->set('comment_bayes = 1')
                 ->where('comment_id = ' . $id)
                 ->update()

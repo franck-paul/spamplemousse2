@@ -14,7 +14,6 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\spamplemousse2;
 
-use dcCore;
 use Dotclear\Helper\Html\XmlTag;
 
 /**
@@ -25,13 +24,13 @@ class BackendRest
     /**
      * Posts a progress.
      *
-     * @param      dcCore                   $core   The core
-     * @param      array<string, string>    $get    The get parameters
-     * @param      array<string, string>    $post   The post parameters
+     * @param      mixed                    $unused     Unused
+     * @param      array<string, string>    $get        The get parameters
+     * @param      array<string, string>    $post       The post parameters
      *
      * @return     XmlTag  The xml message.
      */
-    public static function postProgress(dcCore $core, array $get, array $post): XmlTag
+    public static function postProgress(mixed $unused, array $get, array $post): XmlTag
     {
         $title      = '';
         $urlprefix  = '';

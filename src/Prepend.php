@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\spamplemousse2;
 
 use ArrayObject;
-use dcCore;
 use Dotclear\App;
 use Dotclear\Core\Process;
 
@@ -38,14 +37,12 @@ class Prepend extends Process
             },
         ]);
 
-        if (dcCore::app()->plugins->moduleExists('Uninstaller')) {
-            // Add cleaners to Uninstaller
-            dcCore::app()->addBehavior('UninstallerCleanersConstruct', function (\Dotclear\Plugin\Uninstaller\CleanersStack $cleaners): void {
-                $cleaners
-                    ->set(new Cleaner\Fields())
-                ;
-            });
-        }
+        // Add cleaners to Uninstaller
+        App::behavior()->addBehavior('UninstallerCleanersConstruct', function (\Dotclear\Plugin\Uninstaller\CleanersStack $cleaners): void {
+            $cleaners
+                ->set(new Cleaner\Fields())
+            ;
+        });
 
         return true;
     }

@@ -19,10 +19,7 @@ $this->registerModule(
         'requires'    => [['core', '2.28']],
         'type'        => 'plugin',
         'priority'    => 100,
-        'permissions' => dcCore::app()->auth->makePermissions([
-            dcAuth::PERMISSION_USAGE,
-            dcAuth::PERMISSION_CONTENT_ADMIN,
-        ]),
+        'permissions' => 'My',
 
         'details'    => 'https://open-time.net/?q=spamplemousse2',
         'support'    => 'https://github.com/franck-paul/spamplemousse2',

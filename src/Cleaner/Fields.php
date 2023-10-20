@@ -14,13 +14,11 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\spamplemousse2\Cleaner;
 
-use dcCore;
 use Dotclear\App;
 use Dotclear\Plugin\Uninstaller\{
     ActionDescriptor,
     CleanerDescriptor,
     CleanerParent,
-    ValueDescriptor
 };
 
 /**
@@ -66,7 +64,7 @@ class Fields extends CleanerParent
 
             if ($table && $field) {
                 $sql = 'ALTER TABLE ' . App::con()->prefix() . $table . ' DROP COLUMN ' . $field;
-                dcCore::app()->con->execute($sql);
+                App::con()->execute($sql);
             }
 
             return true;

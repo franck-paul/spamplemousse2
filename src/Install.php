@@ -14,7 +14,7 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\spamplemousse2;
 
-use dcCore;
+use Dotclear\App;
 use Dotclear\Core\Process;
 use Dotclear\Database\Structure;
 use Exception;
@@ -34,7 +34,7 @@ class Install extends Process
 
         try {
             // Init
-            $s = new Structure(dcCore::app()->con, dcCore::app()->prefix);
+            $s = new Structure(App::con(), App::con()->prefix());
 
             // spam_token table creation
             $s->spam_token
@@ -54,10 +54,10 @@ class Install extends Process
             ;
 
             // schema sync
-            $si = new Structure(dcCore::app()->con, dcCore::app()->prefix);
+            $si = new Structure(App::con(), App::con()->prefix());
             $si->synchronize($s);
         } catch (Exception $e) {
-            dcCore::app()->error->add($e->getMessage());
+            App::error()->add($e->getMessage());
         }
 
         return true;
