@@ -38,19 +38,19 @@ class Install extends Process
 
             // spam_token table creation
             $s->spam_token
-                ->token_id('varchar', 255, false, 0)
-                ->token_nham('integer', 0, false, 0)
-                ->token_nspam('integer', 0, false, 0)
-                ->token_mdate('timestamp', 0, false, 'now()')
-                ->token_p('float', 0, false, 0)
-                ->token_mature('smallint', 0, false, 0)
+                ->field('token_id', 'varchar', 255, false, 0)
+                ->field('token_nham', 'integer', 0, false, 0)
+                ->field('token_nspam', 'integer', 0, false, 0)
+                ->field('token_mdate', 'timestamp', 0, false, 'now()')
+                ->field('token_p', 'float', 0, false, 0)
+                ->field('token_mature', 'smallint', 0, false, 0)
                 ->primary('pk_spam_token', 'token_id')
             ;
 
             // we add two columns on the comment table
             $s->comment
-                ->comment_bayes('smallint', 0, false, 0)
-                ->comment_bayes_err('smallint', 0, false, 0)
+                ->field('comment_bayes', 'smallint', 0, false, 0)
+                ->field('comment_bayes_err', 'smallint', 0, false, 0)
             ;
 
             // schema sync
