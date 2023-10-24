@@ -20,6 +20,7 @@ use Dotclear\Database\MetaRecord;
 use Dotclear\Database\Statement\SelectStatement;
 use Dotclear\Database\Statement\UpdateStatement;
 use Dotclear\Helper\Html\Form\Form;
+use Dotclear\Helper\Html\Form\Hidden;
 use Dotclear\Helper\Html\Form\Para;
 use Dotclear\Helper\Html\Form\Submit;
 use Dotclear\Plugin\antispam\SpamFilter;
@@ -226,9 +227,8 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
                 (new Para())->items([
                     (new Submit(['s2_init'], __('Learn from old messages')))
                         ->disabled($learned == $nb_comm),
-                    ... My::hiddenFields([
-                        'action' => 'oldmsg',
-                    ]),
+                    (new Hidden(['action'], 'oldmsg')),
+                    App::nonce()->formNonce(),
                 ]),
             ])
             ->render();
@@ -240,9 +240,8 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             ->fields([
                 (new Para())->items([
                     (new Submit(['s2_maintenance'], __('Cleanup'))),
-                    ... My::hiddenFields([
-                        'action' => 'cleanup',
-                    ]),
+                    (new Hidden(['action'], 'cleanup')),
+                    App::nonce()->formNonce(),
                 ]),
             ])
             ->render();
@@ -255,9 +254,8 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
                 (new Para())->items([
                     (new Submit(['s2_reset'], __('Delete all learned data')))
                         ->extra('onclick="return(confirm(\'' . __('Are you sure?') . '\'));"'),
-                    ... My::hiddenFields([
-                        'action' => 'reset',
-                    ]),
+                    (new Hidden(['action'], 'reset')),
+                    App::nonce()->formNonce(),
                 ]),
             ])
             ->render();
