@@ -22,7 +22,6 @@ use Dotclear\Database\Statement\UpdateStatement;
 use Dotclear\Helper\Html\Form\Form;
 use Dotclear\Helper\Html\Form\Para;
 use Dotclear\Helper\Html\Form\Submit;
-use Dotclear\Interface\Core\BlogInterface;
 use Dotclear\Plugin\antispam\SpamFilter;
 
 /**
@@ -61,7 +60,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
 
         $rs = (new SelectStatement())
             ->columns(['comment_author', 'comment_email', 'comment_site', 'comment_ip', 'comment_content'])
-            ->from(App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME)
+            ->from(App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME)
             ->where('comment_id = ' . $comment_id)
             ->select()
         ;
@@ -123,7 +122,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
 
         $rsBayes = (new SelectStatement())
             ->fields(['comment_bayes', 'comment_bayes_err'])
-            ->from(App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME)
+            ->from(App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME)
             ->where('comment_id = ' . $rs->comment_id)
             ->select();
 
@@ -138,7 +137,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             if ($rsBayes->comment_bayes == 0) {
                 $spamFilter->train((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
                 (new UpdateStatement())
-                    ->ref(App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME)
+                    ->ref(App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME)
                     ->set('comment_bayes = 1')
                     ->where('comment_id = ' . $rs->comment_id)
                     ->update()
@@ -147,7 +146,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
                 $spamFilter->retrain((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
                 $err = $rsBayes->comment_bayes_err ? 0 : 1;
                 (new UpdateStatement())
-                    ->ref(App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME)
+                    ->ref(App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME)
                     ->set('comment_bayes_err = ' . $err)
                     ->where('comment_id = ' . $rs->comment_id)
                     ->update()
@@ -175,7 +174,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
         $sql     = new SelectStatement();
         $sql
             ->column($sql->count('comment_id'))
-            ->from(App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME)
+            ->from(App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME)
         ;
         $rs = $sql->select();
         if ($rs && $rs->fetch()) {
@@ -290,7 +289,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
 
         if ($learned === 1) {
             (new UpdateStatement())
-                ->ref(App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME)
+                ->ref(App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME)
                 ->set('comment_bayes = 1')
                 ->where('comment_id = ' . $id)
                 ->update()

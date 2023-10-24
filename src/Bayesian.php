@@ -16,7 +16,6 @@ namespace Dotclear\Plugin\spamplemousse2;
 
 use Dotclear\App;
 use Dotclear\Database\MetaRecord;
-use Dotclear\Interface\Core\BlogInterface;
 use Dotclear\Plugin\spamplemousse2\Tokenizer\Email;
 use Dotclear\Plugin\spamplemousse2\Tokenizer\Ip;
 use Dotclear\Plugin\spamplemousse2\Tokenizer\Reassembly;
@@ -590,16 +589,16 @@ class Bayesian
             $bayes = App::backend()->spamplemousse2_bayes;
         }
 
-        $rs = new MetaRecord(App::con()->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . (string) $limit . ' OFFSET ' . (string) $offset));
+        $rs = new MetaRecord(App::con()->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . (string) $limit . ' OFFSET ' . (string) $offset));
 
         while ($rs->fetch()) {
             if ($rs->comment_bayes == 0) {
                 $spam = 0;
-                if ($rs->comment_status == BlogInterface::COMMENT_JUNK) {
+                if ($rs->comment_status == App::blog()::COMMENT_JUNK) {
                     $spam = 1;
                 }
                 $bayes->train((string) $rs->comment_author, (string) $rs->comment_email, (string) $rs->comment_site, (string) $rs->comment_ip, (string) $rs->comment_content, $spam);
-                $req = 'UPDATE ' . App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
+                $req = 'UPDATE ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
                 App::con()->execute($req);
             }
         }
@@ -634,7 +633,7 @@ class Bayesian
      */
     public function resetFilter(): void
     {
-        $req = 'UPDATE ' . App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME . ' SET comment_bayes = 0, comment_bayes_err = 0';
+        $req = 'UPDATE ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' SET comment_bayes = 0, comment_bayes_err = 0';
         App::con()->execute($req);
         $req = 'DELETE FROM ' . $this->table;
         App::con()->execute($req);
@@ -648,7 +647,7 @@ class Bayesian
     public function getNumLearnedComments(): int
     {
         $result = 0;
-        $req    = 'SELECT COUNT(comment_id) FROM ' . App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
+        $req    = 'SELECT COUNT(comment_id) FROM ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
         $rs     = new MetaRecord($this->con->select($req));
         if ($rs->fetch()) {
             $result = $rs->f(0);
@@ -665,7 +664,7 @@ class Bayesian
     public function getNumErrorComments(): int
     {
         $result = 0;
-        $req    = 'SELECT COUNT(comment_id) FROM ' . App::con()->prefix() . BlogInterface::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
+        $req    = 'SELECT COUNT(comment_id) FROM ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
         $rs     = new MetaRecord($this->con->select($req));
         if ($rs->fetch()) {
             $result = $rs->f(0);
