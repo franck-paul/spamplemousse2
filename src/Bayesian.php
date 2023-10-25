@@ -106,7 +106,7 @@ class Bayesian
         if ($this->training_mode != 'TOE') {
             $this->basic_train($tok, $spam);
             if (App::task()->checkContext('FRONTEND')) {
-                App::frontend()->spamplemousse2_learned = 1;    // @phpstan-ignore-line
+                App::frontend()->spamplemousse2_learned = 1;
             } else {
                 App::backend()->spamplemousse2_learned = 1;
             }
@@ -253,25 +253,25 @@ class Bayesian
         $nom  = $ip_t->tokenize($nom);
         $nom  = $red_t->tokenize($nom);
         $nom  = $rea_t->tokenize($nom);
-        $nom  = $rea_t->default_tokenize($nom);
+        $nom  = $rea_t->default_tokenize_token($nom);
 
         # mail
         $elem = $url_t->create_token($this->decode($m_email), 'Hmail');
         $mail = is_null($elem) ? [] : [$elem];
         $mail = $email_t->tokenize($mail);
-        $mail = $email_t->default_tokenize($mail);
+        $mail = $email_t->default_tokenize_token($mail);
 
         # website
         $elem = $url_t->create_token($this->decode($m_site), 'Hsite');
         $site = is_null($elem) ? [] : [$elem];
         $site = $url_t->tokenize($site);
-        $site = $url_t->default_tokenize($site);
+        $site = $url_t->default_tokenize_token($site);
 
         # ip
         $elem = $url_t->create_token($this->decode($m_ip), 'Hip');
         $ip   = is_null($elem) ? [] : [$elem];
         $ip   = $ip_t->tokenize($ip);
-        $ip   = $ip_t->default_tokenize($ip);
+        $ip   = $ip_t->default_tokenize_token($ip);
 
         # content handling
         $elem    = $url_t->create_token($this->decode($m_content), '');
@@ -281,11 +281,11 @@ class Bayesian
         $contenu = $ip_t->tokenize($contenu);
         $contenu = $red_t->tokenize($contenu);
         $contenu = $rea_t->tokenize($contenu);
-        $contenu = $rea_t->default_tokenize($contenu);
+        $contenu = $rea_t->default_tokenize_token($contenu);
 
         # result
         $tok = array_merge($nom, $mail, $site, $ip, $contenu);
-        $tok = $this->clean_tokenized_string($tok); // @phpstan-ignore-line
+        $tok = $this->clean_tokenized_string($tok);
 
         return $tok;
     }
@@ -579,7 +579,7 @@ class Bayesian
     {
         if (App::task()->checkContext('FRONTEND')) {
             if (!isset(App::frontend()->spamplemousse2_bayes)) {
-                App::frontend()->spamplemousse2_bayes = new Bayesian(); // @phpstan-ignore-line
+                App::frontend()->spamplemousse2_bayes = new Bayesian();
             }
             $bayes = App::frontend()->spamplemousse2_bayes;
         } else {

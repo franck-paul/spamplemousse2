@@ -139,6 +139,34 @@ abstract class Tokenizer
      *
      * @param      array<int, array<string, mixed>>     $t        Array of tokens
      * @param      string                               $prefix   The prefix to add to the new tokens
+     * @param      string                               $delim    List of delimiters to use for the tokenization
+     *
+     * @return     array<array<string, mixed>>  Array of tokens
+     */
+    public function default_tokenize_token(array $t, string $prefix = '', string $delim = ''): array
+    {
+        return array_filter($this->default_tokenize($t, $prefix, 'token', $delim), fn ($value) => is_array($value));
+    }
+
+    /**
+     * Default tokenization of a string, based on a fixed list of delimiters
+     *
+     * @param      array<int, array<string, mixed>>     $t        Array of tokens
+     * @param      string                               $prefix   The prefix to add to the new tokens
+     * @param      string                               $delim    List of delimiters to use for the tokenization
+     *
+     * @return     array<string>  Array of strings
+     */
+    public function default_tokenize_string(array $t, string $prefix = '', string $delim = ''): array
+    {
+        return array_filter($this->default_tokenize($t, $prefix, 'string', $delim), fn ($value) => is_string($value));
+    }
+
+    /**
+     * Default tokenization of a string, based on a fixed list of delimiters
+     *
+     * @param      array<int, array<string, mixed>>     $t        Array of tokens
+     * @param      string                               $prefix   The prefix to add to the new tokens
      * @param      string                               $type     The result type : 'token' or 'string', returns an array of tokens
      *                                                            or an array of string (like match_url)
      * @param      string                               $delim    List of delimiters to use for the tokenization

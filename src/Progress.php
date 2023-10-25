@@ -230,15 +230,16 @@ class Progress
     {
         $elapsed = 0;
         do {
-            $loopParams = [];
-            $end        = $this->pos + $this->baseinc;
+            $end = $this->pos + $this->baseinc;
             if ($end > $this->stop) {
                 $end = $this->stop;
             }
-            $loopParams[] = $this->baseinc;
-            $loopParams[] = $this->pos;
-            $this->pos    = $end;
-            $tstart       = microtime(true);
+            $loopParams = [
+                $this->baseinc,
+                $this->pos,
+            ];
+            $this->pos = $end;
+            $tstart    = microtime(true);
             call_user_func_array($this->func, $loopParams); // @phpstan-ignore-line
             $tend = microtime(true);
             $elapsed += $tend - $tstart;

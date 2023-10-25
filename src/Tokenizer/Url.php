@@ -36,7 +36,7 @@ class Url extends Tokenizer
         $result  = [];
         $matches = '';
 
-        $scheme      = 'http:\/\/';
+        $scheme      = '[http|https]:\/\/';
         $extrem_host = '[A-Z0-9]';
         $elem_host   = '[A-Z0-9.-]{1,61}';
         $tld         = '[A-Z]{2,6}';
@@ -58,18 +58,20 @@ class Url extends Tokenizer
             } else { // we matched a domain name
                 $tok = $this->create_token($matches[2], '');
                 if (!is_null($tok)) {
-                    $result = array_merge($result, $this->default_tokenize([$tok], '', 'string', '.'));
+                    $default = $this->default_tokenize_string([$tok], '', '.');
+                    $result  = array_merge($result, $default);
                 }
             }
             $tok = $this->create_token($matches[8], '');
             if (!is_null($tok)) {
-                $result   = array_merge($result, $this->default_tokenize([$tok], '', 'string', '/?=.:&'));
+                $default  = $this->default_tokenize_string([$tok], '', '/?=.:&');
+                $result   = array_merge($result, $default);
                 $result[] = $matches[9];
             }
         } else {
             $result = 0;
         }
 
-        return $result; // @phpstan-ignore-line
+        return $result;
     }
 }

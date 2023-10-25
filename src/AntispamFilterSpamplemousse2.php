@@ -280,7 +280,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
     public static function toggleLearnedFlag(Cursor $cur, int $id): void
     {
         if (App::task()->checkContext('FRONTEND')) {
-            $learned = App::frontend()->spamplemousse2_learned; // @phpstan-ignore-line
+            $learned = App::frontend()->spamplemousse2_learned;
         } else {
             $learned = App::backend()->spamplemousse2_learned;
         }
