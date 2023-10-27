@@ -24,7 +24,9 @@ This class implements a progress bar system for some lengthy php scripts.
 class Progress
 {
     private string $title;
+
     private string $urlprefix;
+
     private string $urlreturn;
 
     /**
@@ -33,14 +35,23 @@ class Progress
     private $func;
 
     private int $start;
+
     private int $stop;
+
     private int $baseinc;
+
     private int $pos;
+
     private bool $first_run = false;
+
     private float $total_elapsed;
+
     private float $total_time;
+
     private float $percent = 0;
+
     private float $eta     = 0;
+
     private string $formparams;
 
     /**
@@ -60,18 +71,19 @@ class Progress
      */
     public function __construct(string $title, string $urlprefix, string $urlreturn, array $func, int $start, int $stop, int $baseinc, int $pos = 0, string $formparams = '')
     {
-        $this->start = !empty($_POST['start']) ? $_POST['start'] : $start;
+        $this->start = empty($_POST['start']) ? $start : $_POST['start'];
         if ($_POST['pos'] != '') {
             $this->pos = (int) $_POST['pos'];
-        } elseif ($pos) {
+        } elseif ($pos !== 0) {
             $this->pos       = $pos;
             $this->first_run = true;
         } else {
             $this->pos       = $start;
             $this->first_run = true;
         }
-        $this->stop          = !empty($_POST['stop']) ? (int) $_POST['stop'] : $stop;
-        $this->total_elapsed = !empty($_POST['total_elapsed']) ? (float) $_POST['total_elapsed'] : 0;
+
+        $this->stop          = empty($_POST['stop']) ? $stop : (int) $_POST['stop'];
+        $this->total_elapsed = empty($_POST['total_elapsed']) ? 0 : (float) $_POST['total_elapsed'];
         $this->total_time    = (float) ini_get('max_execution_time') / 4;
         $this->title         = $title;
         $this->urlprefix     = $urlprefix;
@@ -97,13 +109,12 @@ class Progress
         if ($this->pos < $this->stop) {
             $return .= 'style="display: none;"';
         }
+
         $return .= ' href="' . $this->urlreturn . '">' . __('Return') . '</a>';
 
         if (!$this->first_run) {
             if ($this->pos >= $this->stop) {
-                $content .= $return;
-
-                return $content;
+                return $content . $return;
             }
 
             try {
@@ -133,6 +144,7 @@ class Progress
             if ($this->percent != 0) {
                 $content .= sprintf('%d', $this->eta) . ' s';
             }
+
             $content .= '</span></p>';
 
             $content .= '<form action="' . $this->urlprefix . '" method="post">' .
@@ -191,6 +203,7 @@ class Progress
                 $eta_xml->insertNode(sprintf('%d', $this->eta));
                 $rsp->insertNode($eta_xml);
             }
+
             $pos_xml = new XmlTag('pos');
             $pos_xml->insertNode((string) $this->pos);
             $rsp->insertNode($pos_xml);
@@ -234,6 +247,7 @@ class Progress
             if ($end > $this->stop) {
                 $end = $this->stop;
             }
+
             $loopParams = [
                 $this->baseinc,
                 $this->pos,
@@ -244,6 +258,7 @@ class Progress
             $tend = microtime(true);
             $elapsed += $tend - $tstart;
         } while (($elapsed < $this->total_time) && ($this->pos < $this->stop));
+
         $this->total_elapsed += $elapsed;
 
         $this->percent = ($this->pos - $this->start) / ($this->stop - $this->start) * 100;

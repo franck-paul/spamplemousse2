@@ -83,15 +83,13 @@ abstract class Tokenizer
                         # call the matching method
                         $matches = $this->match($remain);
 
-                        if (is_array($matches) && count($matches) > 0) {
+                        if (is_array($matches) && $matches !== []) {
                             # trim and insert the first match
                             $n          = count($matches) - 1;
                             $matches[0] = trim((string) $matches[0]);
                             # part of the string left to the found tokens
-                            if ($matches[0] != '') {
-                                if (!is_null($new_token = $this->create_token($matches[0], $pre, false))) {
-                                    $cur[] = $new_token;
-                                }
+                            if ($matches[0] != '' && !is_null($new_token = $this->create_token($matches[0], $pre, false))) {
+                                $cur[] = $new_token;
                             }
 
                             # matched tokens handling
@@ -99,15 +97,12 @@ abstract class Tokenizer
                             while ($i != $n) {
                                 # we compute here the new prefix
                                 $p = '';
-                                if (!empty($pre) && !empty($this->prefix)) {
-                                    $p = $pre . '*' . $this->prefix;
-                                } else {
-                                    $p = $pre . $this->prefix;
-                                }
+                                $p = !empty($pre) && $this->prefix !== '' ? $pre . '*' . $this->prefix : $pre . $this->prefix;
                                 if (!is_null($new_token = $this->create_token($matches[$i], $p, true))) {
                                     $cur[] = $new_token;
                                 }
-                                $i++;
+
+                                ++$i;
                             }
 
                             # we trim the part of the string right to the found tokens
@@ -120,11 +115,13 @@ abstract class Tokenizer
                                 if (!is_null($new_token = $this->create_token($remain, $pre, false))) {
                                     $cur[] = $new_token;
                                 }
+
                                 $remain = '';
                             }
                         }
                     }
                 } while ($remain != '');
+
                 $tab = [...$tab, ...$cur];
             } else {
                 $tab[] = $e;
@@ -145,7 +142,7 @@ abstract class Tokenizer
      */
     public function default_tokenize_token(array $t, string $prefix = '', string $delim = ''): array
     {
-        return array_filter($this->default_tokenize($t, $prefix, 'token', $delim), fn ($value) => is_array($value));
+        return array_filter($this->default_tokenize($t, $prefix, 'token', $delim), static fn($value) => is_array($value));
     }
 
     /**
@@ -159,7 +156,7 @@ abstract class Tokenizer
      */
     public function default_tokenize_string(array $t, string $prefix = '', string $delim = ''): array
     {
-        return array_filter($this->default_tokenize($t, $prefix, 'string', $delim), fn ($value) => is_string($value));
+        return array_filter($this->default_tokenize($t, $prefix, 'string', $delim), static fn($value) => is_string($value));
     }
 
     /**
@@ -176,7 +173,8 @@ abstract class Tokenizer
     public function default_tokenize(array $t, string $prefix = '', string $type = 'token', string $delim = ''): array
     {
         if ($delim == '') {
-            $delim = '.,;:"?[]{}()+-*/=<>|&~`@_' . "\r\n";
+            $delim = '.,;:"?[]{}()+-*/=<>|&~`@_
+';
         }
 
         $tab = [];
@@ -195,32 +193,27 @@ abstract class Tokenizer
                             if ($sub != '') {
                                 if ($type == 'token') {
                                     $p = ''; # new prefix
-                                    if (!empty($pre) && !empty($prefix)) {
-                                        $p = $pre . '*' . $prefix;
-                                    } else {
-                                        $p = $pre . $prefix;
-                                    }
+                                    $p = !empty($pre) && $prefix !== '' ? $pre . '*' . $prefix : $pre . $prefix;
                                     $tab[] = $this->create_token($sub, $p, true);
                                 } else {
                                     $tab[] = $sub;
                                 }
                             }
+
                             $i = $j + 1;
                         }
-                        $j++;
+
+                        ++$j;
                     }
-                    $j--;
+
+                    --$j;
                     # handling of the last word
                     if (!((mb_strpos($delim, mb_substr($s, $j, 1)) !== false) && (mb_substr($s, $j, 1) == ' '))) {
                         $sub = mb_substr($s, $i, $j - $i + 1);
                         if ($sub !== '') {
                             if ($type == 'token') {
                                 $p = ''; # new prefix
-                                if (!empty($pre) && !empty($prefix)) {
-                                    $p = $pre . '*' . $prefix;
-                                } else {
-                                    $p = $pre . $prefix;
-                                }
+                                $p = !empty($pre) && $prefix !== '' ? $pre . '*' . $prefix : $pre . $prefix;
                                 if (!is_null($new_token = $this->create_token($sub, $p, true))) {
                                     $tab[] = $new_token;
                                 }

@@ -56,8 +56,8 @@ class Install extends Process
             // schema sync
             $si = new Structure(App::con(), App::con()->prefix());
             $si->synchronize($s);
-        } catch (Exception $e) {
-            App::error()->add($e->getMessage());
+        } catch (Exception $exception) {
+            App::error()->add($exception->getMessage());
         }
 
         return true;

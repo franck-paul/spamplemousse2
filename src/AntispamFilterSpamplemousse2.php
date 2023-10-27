@@ -168,7 +168,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
         $content    = '';
         $spamFilter = new Bayesian();
 
-        $action = !empty($_POST['action']) ? $_POST['action'] : null;
+        $action = empty($_POST['action']) ? null : $_POST['action'];
 
         # count nr of comments
         $nb_comm = 0;
@@ -181,6 +181,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
         if ($rs && $rs->fetch()) {
             $nb_comm = $rs->f(0);
         }
+
         $learned = 0;
 
         # request handling
@@ -195,9 +196,8 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             $inc        = 10;
             $title      = __('Learning in progress...');
             $progress   = new Progress($title, $url, $url, ['Bayesian', 'feedCorpus'], $start, (int) $stop, $inc, (int) $pos, $formparams);
-            $content    = $progress->gui($content);
 
-            return $content;
+            return $progress->gui($content);
         } elseif ($action == 'reset') {
             $spamFilter->resetFilter();
             $content .= '<p class="message">' . __('Reset successful.') . '</p>';
@@ -247,7 +247,8 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             ->render();
 
         $content .= '<h5>' . __('Reset filter') . '</h5>';
-        $content .= (new Form('spamplemousse2-reset-form'))
+
+        return $content . (new Form('spamplemousse2-reset-form'))
             ->action($url)
             ->method('post')
             ->fields([
@@ -259,8 +260,6 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
                 ]),
             ])
             ->render();
-
-        return $content;
     }
 
     /**

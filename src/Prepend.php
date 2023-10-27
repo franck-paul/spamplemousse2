@@ -32,13 +32,13 @@ class Prepend extends Process
         }
 
         App::behavior()->addBehaviors([
-            'AntispamInitFilters' => function (ArrayObject $spamfilters): void {
+            'AntispamInitFilters' => static function (ArrayObject $spamfilters) : void {
                 $spamfilters->append(AntispamFilterSpamplemousse2::class);
             },
         ]);
 
         // Add cleaners to Uninstaller
-        App::behavior()->addBehavior('UninstallerCleanersConstruct', function (\Dotclear\Plugin\Uninstaller\CleanersStack $cleaners): void {
+        App::behavior()->addBehavior('UninstallerCleanersConstruct', static function (\Dotclear\Plugin\Uninstaller\CleanersStack $cleaners) : void {
             $cleaners
                 ->set(new Cleaner\Fields())
             ;

@@ -44,9 +44,11 @@ class Reassembly extends Tokenizer
                 if (!preg_match('/[\w]/uis', $word_tmp[0])) {
                     $i = 1;
                 }
-                for (;$i < $n; $i = $i + 2) {
+
+                for (;$i < $n; $i += 2) {
                     $word .= $word_tmp[$i];
                 }
+
                 $pos      = mb_strpos($str, $word_tmp);
                 $result[] = mb_substr($str, 0, (int) $pos);
                 $result[] = $word;
