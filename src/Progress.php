@@ -23,25 +23,6 @@ This class implements a progress bar system for some lengthy php scripts.
  */
 class Progress
 {
-    private string $title;
-
-    private string $urlprefix;
-
-    private string $urlreturn;
-
-    /**
-     * @var array{0:string, 1:string}
-     */
-    private $func;
-
-    private int $start;
-
-    private int $stop;
-
-    private int $baseinc;
-
-    private int $pos;
-
     private bool $first_run = false;
 
     private float $total_elapsed;
@@ -50,9 +31,7 @@ class Progress
 
     private float $percent = 0;
 
-    private float $eta     = 0;
-
-    private string $formparams;
+    private float $eta = 0;
 
     /**
      * Constructs a new instance.
@@ -69,28 +48,30 @@ class Progress
      *
      * Note: the func item method must have two parameters "limit" and "offset" like in a sql query
      */
-    public function __construct(string $title, string $urlprefix, string $urlreturn, array $func, int $start, int $stop, int $baseinc, int $pos = 0, string $formparams = '')
-    {
-        $this->start = empty($_POST['start']) ? $start : $_POST['start'];
+    public function __construct(
+        private string $title,
+        private string $urlprefix,
+        private string $urlreturn,
+        private array $func,
+        private int $start,
+        private int $stop,
+        private int $baseinc,
+        private int $pos = 0,
+        private string $formparams = ''
+    ) {
+        $this->start = empty($_POST['start']) ? $this->start : $_POST['start'];
         if ($_POST['pos'] != '') {
             $this->pos = (int) $_POST['pos'];
-        } elseif ($pos !== 0) {
-            $this->pos       = $pos;
+        } elseif ($this->pos !== 0) {
             $this->first_run = true;
         } else {
             $this->pos       = $start;
             $this->first_run = true;
         }
 
-        $this->stop          = empty($_POST['stop']) ? $stop : (int) $_POST['stop'];
+        $this->stop          = empty($_POST['stop']) ? $this->stop : (int) $_POST['stop'];
         $this->total_elapsed = empty($_POST['total_elapsed']) ? 0 : (float) $_POST['total_elapsed'];
         $this->total_time    = (float) ini_get('max_execution_time') / 4;
-        $this->title         = $title;
-        $this->urlprefix     = $urlprefix;
-        $this->urlreturn     = $urlreturn;
-        $this->formparams    = $formparams;
-        $this->func          = $func;
-        $this->baseinc       = $baseinc;
     }
 
     /**
@@ -149,7 +130,7 @@ class Progress
 
             $content .= '<form action="' . $this->urlprefix . '" method="post">' .
                         $this->formparams .
-                        '<input type="submit" id="next" value="' . __('Continue') . '" />' .
+                        '<input type="submit" id="next" value="' . __('Continue') . '">' .
                         My::parsedHiddenFields([
                             'pos'           => $this->pos,
                             'start'         => $this->start,

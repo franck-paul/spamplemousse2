@@ -189,7 +189,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             $spamFilter->cleanup();
             $content .= '<p class="message">' . __('Cleanup successful.') . '</p>';
         } elseif ($action == 'oldmsg') {
-            $formparams = '<input type="hidden" name="action" value="oldmsg" />';
+            $formparams = '<input type="hidden" name="action" value="oldmsg">';
             $start      = 0;
             $pos        = $spamFilter->getNumLearnedComments();
             $stop       = $nb_comm;
