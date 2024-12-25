@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief spamplemousse2, a plugin for Dotclear 2
  *
@@ -117,7 +118,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
      * @param      string        $content  The comment content
      * @param      MetaRecord    $rs       The comment record
      */
-    public function trainFilter(string $status, string $filter, string $type, ?string $author, ?string $email, ?string $site, ?string $ip, ?string $content, MetaRecord $rs)
+    public function trainFilter(string $status, string $filter, string $type, ?string $author, ?string $email, ?string $site, ?string $ip, ?string $content, MetaRecord $rs): void
     {
         $spamFilter = new Bayesian();
 

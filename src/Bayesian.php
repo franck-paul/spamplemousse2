@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief spamplemousse2, a plugin for Dotclear 2
  *
@@ -34,7 +35,7 @@ class Bayesian
      */
     private $con;
 
-    private string $table;
+    private readonly string $table;
 
     private float $val_hapax = 0.45;
 
@@ -154,20 +155,20 @@ class Bayesian
         $tok = $this->tokenize($author, $email, $site, $ip, $content);
         # we retrain the dataset with this message until the
         #	probability of this message to be a spam changes
-        $init_spam = 0;
+        $init_spam    = 0;
         $current_spam = 0;
-        $proba     = $this->get_probabilities($tok);
-        $p         = $this->combine($proba);
+        $proba        = $this->get_probabilities($tok);
+        $p            = $this->combine($proba);
         if ($p > 0.5) {
-            $init_spam = 1;
+            $init_spam    = 1;
             $current_spam = 1;
         }
 
         $count = 0;
         # the neutralization of the dataset is done by the first pass in this loop
         do {
-            $proba = $this->get_probabilities($tok);
-            $p     = $this->combine($proba);
+            $proba        = $this->get_probabilities($tok);
+            $p            = $this->combine($proba);
             $current_spam = $p > 0.5 ? 1 : 0;
             ++$count;
             $this->basic_train($tok, $spam, true);
@@ -238,10 +239,10 @@ class Bayesian
         $red_t   = new Redundancies();
         $rea_t   = new Reassembly();
         # headers handling
-        $nom = [];
-        $mail = [];
-        $site = [];
-        $ip = [];
+        $nom     = [];
+        $mail    = [];
+        $site    = [];
+        $ip      = [];
         $contenu = [];
 
         # name
@@ -402,10 +403,10 @@ class Bayesian
             $nr    = 0;
             if ($spam !== 0) {
                 $nspam = $token['token_nspam'] + 1;
-                $nham = $retrain ? $token['token_nham'] - 1 : $token['token_nham'];
+                $nham  = $retrain ? $token['token_nham'] - 1 : $token['token_nham'];
             } else {
                 $nspam = $retrain ? $token['token_nspam'] - 1 : $token['token_nspam'];
-                $nham = $token['token_nham'] + 1;
+                $nham  = $token['token_nham'] + 1;
             }
 
             $nr = $nspam * 2 + $nham;

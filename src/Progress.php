@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief spamplemousse2, a plugin for Dotclear 2
  *
@@ -27,7 +28,7 @@ class Progress
 
     private float $total_elapsed;
 
-    private float $total_time;
+    private readonly float $total_time;
 
     private float $percent = 0;
 
@@ -49,15 +50,15 @@ class Progress
      * Note: the func item method must have two parameters "limit" and "offset" like in a sql query
      */
     public function __construct(
-        private string $title,
-        private string $urlprefix,
-        private string $urlreturn,
+        private readonly string $title,
+        private readonly string $urlprefix,
+        private readonly string $urlreturn,
         private array $func,
         private int $start,
         private int $stop,
-        private int $baseinc,
+        private readonly int $baseinc,
         private int $pos = 0,
-        private string $formparams = ''
+        private readonly string $formparams = ''
     ) {
         $this->start = empty($_POST['start']) ? $this->start : $_POST['start'];
         if ($_POST['pos'] != '') {

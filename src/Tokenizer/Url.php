@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief spamplemousse2, a plugin for Dotclear 2
  *
@@ -49,25 +50,25 @@ class Url extends Tokenizer
         $res    = preg_match('/' . $regexp . '(.*)/uism', $str, $matches);
         if ($res != 0) {
             $result     = [];
-            $url        = 'http://' . ($matches[1] ?? '') . ($matches[8] ?? '');
+            $url        = 'http://' . ($matches[1] ?? '') . ($matches[8] ?? '');    // @phpstan-ignore-line
             $pos        = mb_strpos($str, $url);
             $result[]   = mb_substr($str, 0, (int) $pos);
-            $matched_ip = $matches[3] ?? '';
+            $matched_ip = $matches[3] ?? '';    // @phpstan-ignore-line
             if ($matched_ip !== '' && $matched_ip !== '0') {
                 $result[] = $matched_ip;
             } else { // we matched a domain name
-                $tok = $this->create_token($matches[2] ?? '', '');
+                $tok = $this->create_token($matches[2] ?? '', '');  // @phpstan-ignore-line
                 if (!is_null($tok)) {
                     $default = $this->default_tokenize_string([$tok], '', '.');
                     $result  = [...$result, ...$default];
                 }
             }
 
-            $tok = $this->create_token($matches[8] ?? '', '');
+            $tok = $this->create_token($matches[8] ?? '', '');  // @phpstan-ignore-line
             if (!is_null($tok)) {
                 $default  = $this->default_tokenize_string([$tok], '', '/?=.:&');
                 $result   = array_merge($result, $default);
-                $result[] = $matches[9] ?? '';
+                $result[] = $matches[9] ?? '';  // @phpstan-ignore-line
             }
         } else {
             $result = 0;

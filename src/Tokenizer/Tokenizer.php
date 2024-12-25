@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief spamplemousse2, a plugin for Dotclear 2
  *
@@ -110,7 +111,7 @@ abstract class Tokenizer
                             $remain = trim((string) $matches[$n]);
                         } else {
                             # part of the string right to the found tokens
-                            $remain = trim($remain);
+                            $remain = trim((string) $remain);
                             if ($remain != '') {
                                 if (!is_null($new_token = $this->create_token($remain, $pre, false))) {
                                     $cur[] = $new_token;
@@ -142,7 +143,7 @@ abstract class Tokenizer
      */
     public function default_tokenize_token(array $t, string $prefix = '', string $delim = ''): array
     {
-        return array_filter($this->default_tokenize($t, $prefix, 'token', $delim), static fn($value) => is_array($value));
+        return array_filter($this->default_tokenize($t, $prefix, 'token', $delim), static fn ($value) => is_array($value));
     }
 
     /**
@@ -156,7 +157,7 @@ abstract class Tokenizer
      */
     public function default_tokenize_string(array $t, string $prefix = '', string $delim = ''): array
     {
-        return array_filter($this->default_tokenize($t, $prefix, 'string', $delim), static fn($value) => is_string($value));
+        return array_filter($this->default_tokenize($t, $prefix, 'string', $delim), static fn ($value) => is_string($value));
     }
 
     /**
@@ -185,15 +186,15 @@ abstract class Tokenizer
                     $i   = 0; # start of mb_substring
                     $j   = 0; # end of mb_substring
                     $s   = $e['elem'];
-                    $n   = mb_strlen($s);
+                    $n   = mb_strlen((string) $s);
                     $pre = $e['prefix'];
                     while ($j != $n) {
-                        if ((mb_strpos($delim, mb_substr($s, $j, 1)) !== false) || (mb_substr($s, $j, 1) == ' ')) {
-                            $sub = mb_substr($s, $i, $j - $i);
+                        if ((mb_strpos($delim, mb_substr((string) $s, $j, 1)) !== false) || (mb_substr((string) $s, $j, 1) == ' ')) {
+                            $sub = mb_substr((string) $s, $i, $j - $i);
                             if ($sub != '') {
                                 if ($type == 'token') {
-                                    $p = ''; # new prefix
-                                    $p = !empty($pre) && $prefix !== '' ? $pre . '*' . $prefix : $pre . $prefix;
+                                    $p     = ''; # new prefix
+                                    $p     = !empty($pre) && $prefix !== '' ? $pre . '*' . $prefix : $pre . $prefix;
                                     $tab[] = $this->create_token($sub, $p, true);
                                 } else {
                                     $tab[] = $sub;
@@ -208,8 +209,8 @@ abstract class Tokenizer
 
                     --$j;
                     # handling of the last word
-                    if (!((mb_strpos($delim, mb_substr($s, $j, 1)) !== false) && (mb_substr($s, $j, 1) == ' '))) {
-                        $sub = mb_substr($s, $i, $j - $i + 1);
+                    if (!((mb_strpos($delim, mb_substr((string) $s, $j, 1)) !== false) && (mb_substr((string) $s, $j, 1) == ' '))) {
+                        $sub = mb_substr((string) $s, $i, $j - $i + 1);
                         if ($sub !== '') {
                             if ($type == 'token') {
                                 $p = ''; # new prefix
