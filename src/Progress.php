@@ -106,7 +106,7 @@ class Progress
             }
         }
 
-        if ($error != '') {
+        if ($error !== '') {
             $content .= '<p class="message">' . __('Error:') . ' ' . $error . '</p>';
         } else {
             $content .= My::jsLoad('progress.js') .
@@ -172,7 +172,7 @@ class Progress
             }
         }
 
-        if ($error != '') {
+        if ($error !== '') {
             $error_xml = new XmlTag('error');
             $error_xml->insertNode($error);
             $rsp->insertNode($error_xml);

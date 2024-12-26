@@ -132,7 +132,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             $rsBayes->fetch();
 
             $spam = 0;
-            if ($status == 'spam') { # the current action marks the comment as spam
+            if ($status === 'spam') { # the current action marks the comment as spam
                 $spam = 1;
             }
 
@@ -196,7 +196,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             $stop       = $nb_comm;
             $inc        = 10;
             $title      = __('Learning in progress...');
-            $progress   = new Progress($title, $url, $url, ['Bayesian', 'feedCorpus'], $start, (int) $stop, $inc, (int) $pos, $formparams);
+            $progress   = new Progress($title, $url, $url, ['Bayesian', 'feedCorpus'], $start, (int) $stop, $inc, $pos, $formparams);
 
             return $progress->gui($content);
         } elseif ($action == 'reset') {

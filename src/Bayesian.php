@@ -87,7 +87,7 @@ class Bayesian
      *
      * @return     bool|null    True if spam, false if non-spam or null if undefined
      */
-    public function handle_new_message(string $author, string $email, string $site, string $ip, string $content)
+    public function handle_new_message(string $author, string $email, string $site, string $ip, string $content): ?bool
     {
         $spam = 0;
         $tok  = $this->tokenize(
@@ -103,7 +103,7 @@ class Bayesian
             $spam = 1;
         }
 
-        if ($this->training_mode != 'TOE') {
+        if ($this->training_mode !== 'TOE') {
             $this->basic_train($tok, $spam);
             if (App::task()->checkContext('FRONTEND')) {
                 App::frontend()->spamplemousse2_learned = 1;
@@ -135,7 +135,7 @@ class Bayesian
     public function train(string $author, string $email, string $site, string $ip, string $content, int $spam): void
     {
         $tok = $this->tokenize($author, $email, $site, $ip, $content);
-        if ($this->training_mode != 'TOE') {
+        if ($this->training_mode !== 'TOE') {
             $this->basic_train($tok, $spam);
         }
     }
@@ -395,7 +395,7 @@ class Bayesian
             }
         }
 
-        if ($known_token && (($this->training_mode != 'TUM') || ($token['token_mature'] != 1) || $retrain)) {
+        if ($known_token && (($this->training_mode !== 'TUM') || ($token['token_mature'] != 1) || $retrain)) {
             # update
             # nr of occurences in each corpuses
             $nspam = 0;
@@ -429,7 +429,7 @@ class Bayesian
                 }
             }
 
-            if ($this->training_mode == 'TUM') {
+            if ($this->training_mode === 'TUM') {
                 # evaluate token maturity
                 $maturity = ($nr >= $this->tum_maturity) ? 1 : 0;
                 $strReq   = 'UPDATE ' . $this->table . ' SET token_nham=' . $nham . ', token_nspam=' .
@@ -506,18 +506,13 @@ class Bayesian
     /**
      * Computes Fisher-Robinson's inverse Chi-Square function
      * adapted from a C version ("Ending Spam", Jonathan Zdziarski, p. 79)
-     *
-     * @param      float       $x
-     * @param      int         $v
-     *
-     * @return     float
      */
     private function inverse_chi_square(float $x, int $v): float
     {
         $i = 0;
 
         $m = $x / 2;
-        $s = exp(0 - $m);
+        $s = exp(-$m);
         $t = $s;
 
         for ($i = 1; $i < ($v / 2); ++$i) {
@@ -585,7 +580,7 @@ class Bayesian
             $bayes = App::backend()->spamplemousse2_bayes;
         }
 
-        $rs = new MetaRecord(App::con()->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . (string) $limit . ' OFFSET ' . (string) $offset));
+        $rs = new MetaRecord(App::con()->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . $limit . ' OFFSET ' . $offset));
 
         while ($rs->fetch()) {
             if ($rs->comment_bayes == 0) {
@@ -620,7 +615,7 @@ class Bayesian
         App::con()->execute($req);
 
         # if in TUM mode, delete all matured data between 0.3 and 0.7
-        if ($this->training_mode == 'TUM') {
+        if ($this->training_mode === 'TUM') {
             $req = 'DELETE FROM ' . $this->table . ' WHERE token_p > 0.3 AND token_p < 0.7 AND token_mature = 1';
             App::con()->execute($req);
         }
