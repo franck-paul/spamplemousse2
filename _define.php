@@ -15,7 +15,7 @@ $this->registerModule(
     'Spamplemousse2',
     'A bayesian spam filter for dotclear',
     'Alain Vagner and contributors',
-    '7.3',
+    '8.0',
     [
         'requires'    => [['core', '2.33']],
         'type'        => 'plugin',
