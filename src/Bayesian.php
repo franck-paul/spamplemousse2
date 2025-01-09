@@ -585,7 +585,7 @@ class Bayesian
         while ($rs->fetch()) {
             if ($rs->comment_bayes == 0) {
                 $spam = 0;
-                if ($rs->comment_status == App::blog()::COMMENT_JUNK) {
+                if ($rs->comment_status == App::status()->comment()::JUNK) {
                     $spam = 1;
                 }
 

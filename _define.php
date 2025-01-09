@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief Spamplemousse2, a plugin for Dotclear 2
  *
@@ -16,7 +17,7 @@ $this->registerModule(
     'Alain Vagner and contributors',
     '7.3',
     [
-        'requires'    => [['core', '2.28']],
+        'requires'    => [['core', '2.33']],
         'type'        => 'plugin',
         'priority'    => 100,
         'permissions' => 'My',
