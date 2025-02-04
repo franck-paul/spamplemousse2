@@ -4,6 +4,7 @@
     <version>8.0</version>
     <author>Alain Vagner</author>
     <desc>A bayesian spam filter for dotclear</desc>
+    <date>2003-08-13T13:42:00+0100</date>
     <file>https://github.com/franck-paul/spamplemousse2/releases/download/8.0/plugin-spamplemousse2-8.0.zip</file>
     <da:dcmin>2.33</da:dcmin>
     <da:details>https://open-time.net/?q=spamplemousse2</da:details>
