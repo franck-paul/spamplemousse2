@@ -16,11 +16,18 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\spamplemousse2;
 
 use Dotclear\Core\Backend\Page;
+use Dotclear\Helper\Html\Form\Form;
+use Dotclear\Helper\Html\Form\Link;
+use Dotclear\Helper\Html\Form\Note;
+use Dotclear\Helper\Html\Form\Para;
+use Dotclear\Helper\Html\Form\Set;
+use Dotclear\Helper\Html\Form\Submit;
+use Dotclear\Helper\Html\Form\Text;
 use Dotclear\Helper\Html\XmlTag;
 use Exception;
 
 /**
-This class implements a progress bar system for some lengthy php scripts.
+ * This class implements a progress bar system for some lengthy php scripts.
  */
 class Progress
 {
@@ -61,9 +68,9 @@ class Progress
         private readonly string $formparams = ''
     ) {
         $this->start = empty($_POST['start']) ? $this->start : $_POST['start'];
-        if ($_POST['pos'] != '') {
+        if (isset($_POST['pos']) && $_POST['pos'] != '') {
             $this->pos = (int) $_POST['pos'];
-        } elseif ($this->pos !== 0) {
+        } elseif ($this->pos > 0) {
             $this->first_run = true;
         } else {
             $this->pos       = $start;
@@ -72,7 +79,7 @@ class Progress
 
         $this->stop          = empty($_POST['stop']) ? $this->stop : (int) $_POST['stop'];
         $this->total_elapsed = empty($_POST['total_elapsed']) ? 0 : (float) $_POST['total_elapsed'];
-        $this->total_time    = (float) ini_get('max_execution_time') / 4;
+        $this->total_time    = min((float) ini_get('max_execution_time') / 4, 10);  // 10 seconds max between two feedbacks
     }
 
     /**
@@ -84,19 +91,25 @@ class Progress
      */
     public function gui(string $content): string
     {
-        $content .= '<h3>' . $this->title . '</h3>';
+        $items = [];
         $error = '';
 
-        $return = '<a id="return" ';
-        if ($this->pos < $this->stop) {
-            $return .= 'style="display: none;"';
-        }
+        $items[] = (new Text('h3', $this->title));
 
-        $return .= ' href="' . $this->urlreturn . '">' . __('Return') . '</a>';
+        $back = (new Link('return'))
+            ->href($this->urlreturn)
+            ->text(__('Return'));
 
         if (!$this->first_run) {
             if ($this->pos >= $this->stop) {
-                return $content . $return;
+                return
+                $content .
+                (new Set())
+                    ->items([
+                        ... $items,
+                        $back,
+                    ])
+                ->render();
             }
 
             try {
@@ -107,43 +120,71 @@ class Progress
         }
 
         if ($error !== '') {
-            $content .= '<p class="message">' . __('Error:') . ' ' . $error . '</p>';
+            $items[] = (new Note())
+                ->class('message')
+                ->text(__('Error:') . ' ' . $error);
         } else {
-            $content .= My::jsLoad('progress.js') .
-                Page::jsJson('spamplemousse2', [
-                    'funcClass'  => $this->func[0],
-                    'funcMethod' => $this->func[1],
-                    'pos'        => $this->pos,
-                    'start'      => $this->start,
-                    'stop'       => $this->stop,
-                    'baseInc'    => $this->baseinc,
-                ]) .
-                My::jsLoad('update.js');
-
-            // display informations
-            $content .= '<p>' . __('Progress:') . ' <span id="percent">' . sprintf('%d', $this->percent) . '</span> %</p>';
-            $content .= '<p>' . __('Time remaining:') . ' <span id="eta">';
-            if ($this->percent != 0) {
-                $content .= sprintf('%d', $this->eta) . ' s';
+            // Update percentage
+            $this->percent = ($this->pos - $this->start) / ($this->stop - $this->start) * 100;
+            if ($this->percent > 0) {
+                $this->eta = 100 * $this->total_elapsed / $this->percent - $this->total_elapsed;
             }
 
-            $content .= '</span></p>';
+            $head = Page::jsJson('spamplemousse2', [
+                'funcClass'  => $this->func[0],
+                'funcMethod' => $this->func[1],
+                'pos'        => $this->pos,
+                'start'      => $this->start,
+                'stop'       => $this->stop,
+                'baseInc'    => $this->baseinc,
+            ]) .
+            My::jsLoad('update.js') .
+            My::cssLoad('update.css');
 
-            $content .= '<form action="' . $this->urlprefix . '" method="post">' .
-                        $this->formparams .
-                        '<input type="submit" id="next" value="' . __('Continue') . '">' .
-                        My::parsedHiddenFields([
-                            'pos'           => $this->pos,
-                            'start'         => $this->start,
-                            'stop'          => $this->stop,
-                            'total_elapsed' => (string) $this->total_elapsed,
-                        ]) .
-                        '</form>';
+            $items[] = (new Text(null, $head));
 
-            $content .= $return;
+            // display informations
+            $items[] = (new Para())
+                ->separator(' ')
+                ->items([
+                    (new Text(null, __('Progress:'))),
+                    (new Text('progress', sprintf('%d/100', $this->percent)))
+                        ->id('percent')
+                        ->max(100)
+                        ->value((int) $this->percent),
+                ]);
+
+            $items[] = (new Para())
+                ->separator(' ')
+                ->items([
+                    (new Text(null, __('Time remaining:'))),
+                    (new Text('span', '...'))
+                        ->id('eta'),
+                ]);
+
+            $items[] = (new Form('form-progress'))
+                ->method('post')
+                ->action($this->urlprefix)
+                ->fields([
+                    (new Text(null, $this->formparams)),
+                    (new Submit('next', __('Continue'))),
+                    ... My::hiddenFields([
+                        'pos'           => $this->pos,
+                        'start'         => $this->start,
+                        'stop'          => $this->stop,
+                        'total_elapsed' => (string) $this->total_elapsed,
+                    ]),
+                ]);
         }
 
-        return $content;
+        return
+        $content .
+        (new Set())
+            ->items([
+                ... $items,
+                $back,
+            ])
+        ->render();
     }
 
     /**
@@ -223,20 +264,29 @@ class Progress
      */
     private function compute(): void
     {
+        $staticMethod = $this->func[0] . '::' . $this->func[1];
+        if (!is_callable($staticMethod)) {
+            // Something bad, no method to call
+            $this->percent = 100;
+            $this->eta     = 0;
+            $this->pos     = $this->stop;
+
+            return;
+        }
+
         $elapsed = 0;
         do {
-            $end = $this->pos + $this->baseinc;
-            if ($end > $this->stop) {
-                $end = $this->stop;
-            }
-
+            // Prepare current loop parameters
             $loopParams = [
                 $this->baseinc,
                 $this->pos,
             ];
-            $this->pos = $end;
-            $tstart    = microtime(true);
-            call_user_func_array($this->func, $loopParams); // @phpstan-ignore-line
+
+            // Prepare next loop parameters
+            $this->pos = min($this->pos + $this->baseinc, $this->stop);
+
+            $tstart = microtime(true);
+            call_user_func_array($staticMethod, $loopParams);
             $tend = microtime(true);
             $elapsed += $tend - $tstart;
         } while (($elapsed < $this->total_time) && ($this->pos < $this->stop));
@@ -244,7 +294,7 @@ class Progress
         $this->total_elapsed += $elapsed;
 
         $this->percent = ($this->pos - $this->start) / ($this->stop - $this->start) * 100;
-        if ($this->percent != 0) {
+        if ($this->percent > 0) {
             $this->eta = 100 * $this->total_elapsed / $this->percent - $this->total_elapsed;
         }
     }

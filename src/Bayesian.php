@@ -89,7 +89,7 @@ class Bayesian
      */
     public function handle_new_message(string $author, string $email, string $site, string $ip, string $content): ?bool
     {
-        $spam = 0;
+        $spam = false;
         $tok  = $this->tokenize(
             $author,
             $email,
@@ -100,7 +100,7 @@ class Bayesian
         $proba = $this->get_probabilities($tok);
         $p     = $this->combine($proba);
         if ($p > 0.5) {
-            $spam = 1;
+            $spam = true;
         }
 
         if ($this->training_mode !== 'TOE') {
@@ -130,12 +130,12 @@ class Bayesian
      * @param      string  $site     The comment author site
      * @param      string  $ip       The comment author IP address
      * @param      string  $content  The comment content
-     * @param      int     $spam     1 if spam
+     * @param      bool    $spam     True if spam
      */
-    public function train(string $author, string $email, string $site, string $ip, string $content, int $spam): void
+    public function train(string $author, string $email, string $site, string $ip, string $content, bool $spam): void
     {
-        $tok = $this->tokenize($author, $email, $site, $ip, $content);
         if ($this->training_mode !== 'TOE') {
+            $tok = $this->tokenize($author, $email, $site, $ip, $content);
             $this->basic_train($tok, $spam);
         }
     }
@@ -148,9 +148,9 @@ class Bayesian
      * @param      string  $site     The comment author site
      * @param      string  $ip       The comment author IP address
      * @param      string  $content  The comment content
-     * @param      int     $spam     1 if spam
+     * @param      bool    $spam     True if spam
      */
-    public function retrain(string $author, string $email, string $site, string $ip, string $content, int $spam): void
+    public function retrain(string $author, string $email, string $site, string $ip, string $content, bool $spam): void
     {
         $tok = $this->tokenize($author, $email, $site, $ip, $content);
         # we retrain the dataset with this message until the
@@ -335,10 +335,10 @@ class Bayesian
      * Basic training for one token
      *
      * @param      string  $t        The token
-     * @param      int     $spam     1 if spam
+     * @param      bool    $spam     True if spam
      * @param      bool    $retrain  True if the message was already trained
      */
-    private function basic_train_unit(string $t, int $spam, bool $retrain = false): void
+    private function basic_train_unit(string $t, bool $spam, bool $retrain = false): void
     {
         if (mb_strlen($t) > 255) {
             $t = mb_substr($t, 0, 255);
@@ -352,28 +352,26 @@ class Bayesian
         $rs         = new MetaRecord($this->con->select($strReq));
         $total_spam = $rs->f(0);
 
-        $token       = null;
-        $known_token = false;
+        $token = null;
 
         # we determine if the token is already in the dataset
         $strReq = 'SELECT token_nham, token_nspam, token_p, token_mature FROM ' . $this->table . ' WHERE token_id = \'' . $this->con->escapeStr($t) . '\'';
         $rs     = new MetaRecord($this->con->select($strReq));
 
+        $known_token = false;
         if (!$rs->isEmpty()) {
             $known_token = true;
             if ($retrain) {
                 # we test if it is possible to move the state of the token
-                # if it is present in 0 ham and we try to pass it in spam, we have a problem
-                if (!($spam && (!$rs->token_nham)) && !((!$spam) && (!$rs->token_nspam))) {
-                    $known_token = true;
-                } else {
+                if (!$spam && $rs->token_nspam > 0) {
+                    // Not spam but already found in spam, we have a problem
                     return;
                 }
-            } else {
-                $known_token = true;
+                if ($spam && $rs->token_nham > 0) {
+                    // Spam but already found in ham, we have a problem
+                    return;
+                }
             }
-        } else {
-            $known_token = false;
         }
 
         if ($known_token) {
@@ -381,7 +379,7 @@ class Bayesian
         }
 
         # we compute the new values for total_spam and total_ham
-        if ($spam !== 0) {
+        if ($spam) {
             $total_spam += $known_token ? 1 : 0;
             $total_spam += $known_token ? 0 : 1;
             if ($retrain) {
@@ -401,7 +399,7 @@ class Bayesian
             $nspam = 0;
             $nham  = 0;
             $nr    = 0;
-            if ($spam !== 0) {
+            if ($spam) {
                 $nspam = $token['token_nspam'] + 1;
                 $nham  = $retrain ? $token['token_nham'] - 1 : $token['token_nham'];
             } else {
@@ -448,13 +446,14 @@ class Bayesian
             #insert an hapax
             $nspam = 0;
             $nham  = 0;
-            if ($spam !== 0) {
+            if ($spam) {
                 $nspam = 1;
             } else {
                 $nham = 1;
             }
 
-            $p      = $this->val_hapax;
+            $p = $this->val_hapax;
+
             $strReq = 'INSERT INTO ' . $this->table . ' (token_id, token_nham, token_nspam, token_mdate, token_p) VALUES (\'' . $this->con->escapeStr($t) . '\',' . $nham . ',' . $nspam . ',\'' . date('Y-m-d H:i:s') . '\' ,\'' . $p . '\')';
             $this->con->execute($strReq);
         }
@@ -464,10 +463,10 @@ class Bayesian
      * Basic training for a message
      *
      * @param      array<string>    $tok      The array of tokens
-     * @param      int              $spam     1 if spam
+     * @param      bool             $spam     True if spam
      * @param      bool             $retrain  True if the message was already trained
      */
-    private function basic_train(array $tok, int $spam, bool $retrain = false): void
+    private function basic_train(array $tok, bool $spam, bool $retrain = false): void
     {
         foreach ($tok as $t) {
             $this->basic_train_unit($t, $spam, $retrain);
@@ -571,25 +570,32 @@ class Bayesian
                 App::frontend()->spamplemousse2_bayes = new Bayesian();
             }
 
+            /**
+             * @var        Bayesian
+             */
             $bayes = App::frontend()->spamplemousse2_bayes;
         } else {
             if (!isset(App::backend()->spamplemousse2_bayes)) {
                 App::backend()->spamplemousse2_bayes = new Bayesian();
             }
 
+            /**
+             * @var        Bayesian
+             */
             $bayes = App::backend()->spamplemousse2_bayes;
         }
 
         $rs = new MetaRecord(App::con()->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . $limit . ' OFFSET ' . $offset));
 
         while ($rs->fetch()) {
-            if ($rs->comment_bayes == 0) {
-                $spam = 0;
+            if ((int) $rs->comment_bayes === 0) {
+                $spam = false;
                 if ($rs->comment_status == App::status()->comment()::JUNK) {
-                    $spam = 1;
+                    $spam = true;
                 }
 
                 $bayes->train((string) $rs->comment_author, (string) $rs->comment_email, (string) $rs->comment_site, (string) $rs->comment_ip, (string) $rs->comment_content, $spam);
+
                 $req = 'UPDATE ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
                 App::con()->execute($req);
             }

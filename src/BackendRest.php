@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief spamplemousse2, a plugin for Dotclear 2
  *
@@ -40,7 +41,7 @@ class BackendRest
         $func       = [$funcClass, $funcMethod];
         $start      = empty($post['start']) ? 0 : $post['start'];
         $stop       = empty($post['stop']) ? 0 : $post['stop'];
-        $baseInc    = empty($post['baseInc']) ? 0 : $post['baseInc'];
+        $baseInc    = empty($post['baseInc']) ? 10 : $post['baseInc'];
 
         $progress = new Progress($title, $urlprefix, $urlreturn, $func, (int) $start, (int) $stop, (int) $baseInc);
 

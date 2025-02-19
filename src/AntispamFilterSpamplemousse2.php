@@ -16,14 +16,20 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\spamplemousse2;
 
 use Dotclear\App;
+use Dotclear\Core\Backend\Page;
 use Dotclear\Database\Cursor;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Database\Statement\SelectStatement;
 use Dotclear\Database\Statement\UpdateStatement;
 use Dotclear\Helper\Html\Form\Form;
 use Dotclear\Helper\Html\Form\Hidden;
+use Dotclear\Helper\Html\Form\Li;
+use Dotclear\Helper\Html\Form\Note;
 use Dotclear\Helper\Html\Form\Para;
+use Dotclear\Helper\Html\Form\Set;
 use Dotclear\Helper\Html\Form\Submit;
+use Dotclear\Helper\Html\Form\Text;
+use Dotclear\Helper\Html\Form\Ul;
 use Dotclear\Plugin\antispam\SpamFilter;
 
 /**
@@ -131,9 +137,9 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
         if ($rsBayes) {
             $rsBayes->fetch();
 
-            $spam = 0;
+            $spam = false;
             if ($status === 'spam') { # the current action marks the comment as spam
-                $spam = 1;
+                $spam = true;
             }
 
             if ($rsBayes->comment_bayes == 0) {
@@ -166,12 +172,11 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
      */
     public function gui(string $url): string
     {
-        $content    = '';
+        $items      = [];
         $spamFilter = new Bayesian();
+        $action     = empty($_POST['action']) ? null : $_POST['action'];
 
-        $action = empty($_POST['action']) ? null : $_POST['action'];
-
-        # count nr of comments
+        # count number of comments
         $nb_comm = 0;
         $sql     = new SelectStatement();
         $sql
@@ -188,79 +193,98 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
         # request handling
         if ($action == 'cleanup') {
             $spamFilter->cleanup();
-            $content .= '<p class="message">' . __('Cleanup successful.') . '</p>';
+            $items[] = (new Note())
+                ->class('message')
+                ->text(__('Cleanup successful.'));
         } elseif ($action == 'oldmsg') {
-            $formparams = '<input type="hidden" name="action" value="oldmsg">';
+            $formparams = (new Hidden('action', 'oldmsg'))->render();
             $start      = 0;
             $pos        = $spamFilter->getNumLearnedComments();
             $stop       = $nb_comm;
             $inc        = 10;
             $title      = __('Learning in progress...');
-            $progress   = new Progress($title, $url, $url, ['Bayesian', 'feedCorpus'], $start, (int) $stop, $inc, $pos, $formparams);
+            $class      = Bayesian::class;
+            $progress   = new Progress($title, $url, $url, [$class, 'feedCorpus'], $start, (int) $stop, $inc, $pos, $formparams);
 
-            return $progress->gui($content);
+            return $progress->gui('');
         } elseif ($action == 'reset') {
             $spamFilter->resetFilter();
-            $content .= '<p class="message">' . __('Reset successful.') . '</p>';
+            $items[] = (new Note())
+                ->class('message')
+                ->text(__('Reset successful.'));
         }
 
         $errors  = $spamFilter->getNumErrorComments();
         $learned = $spamFilter->getNumLearnedComments();
 
-        $content .= '<h4>' . __('Statistics') . '</h4>';
-        $content .= '<ul>';
-        $content .= '<li>' . __('Learned comments:') . ' ' . $learned . '</li>';
-        $content .= '<li>' . __('Total comments:') . ' ' . $nb_comm . '</li>';
-        $content .= '<li>' . __('Learned tokens:') . ' ' . $spamFilter->getNumLearnedTokens() . '</li>';
-        if ($learned != 0) {
-            $percent = ($learned - $errors) / $learned * 100;
-            $content .= '<li><strong>' . __('Accuracy:') . ' ' . sprintf('%.02f %%', $percent) . '</strong></li>';
+        $accuracy = [];
+        if ($learned > 0) {
+            $percent    = ($learned - $errors) / $learned * 100;
+            $accuracy[] = (new Li())
+                ->items([
+                    (new Text('strong', __('Accuracy:') . ' ' . sprintf('%.02f %%', $percent))),
+                ]);
         }
 
-        $content .= '</ul>';
-        $content .= '<h4>' . __('Actions') . '</h4>';
+        $items[] = (new Text(
+            null,
+            Page::jsJson('spamplemousse2', [
+                'msg_reset' => __('Are you sure?'),
+            ]) .
+            My::jsLoad('gui.js')
+        ));
 
-        $content .= '<h5>' . __('Initialization') . '</h5>';
-        $content .= (new Form('spamplemousse2-init-form'))
-            ->action($url)
-            ->method('post')
-            ->fields([
-                (new Para())->items([
-                    (new Submit(['s2_init'], __('Learn from old messages')))
-                        ->disabled($learned == $nb_comm),
-                    (new Hidden(['action'], 'oldmsg')),
-                    App::nonce()->formNonce(),
-                ]),
+        return (new Set())
+            ->items([
+                ... $items,
+                (new Text('h4', __('Statistics'))),
+                (new Ul())
+                    ->items([
+                        (new Li())
+                            ->text(__('Learned comments:') . ' ' . $learned),
+                        (new Li())
+                            ->text(__('Total comments:') . ' ' . $nb_comm),
+                        (new Li())
+                            ->text(__('Learned tokens:') . ' ' . $spamFilter->getNumLearnedTokens()),
+                        ... $accuracy,
+                    ]),
+                (new Text('h4', __('Actions'))),
+                (new Text('h5', __('Initialization'))),
+                (new Form('spamplemousse2-init-form'))
+                    ->action($url)
+                    ->method('post')
+                    ->fields([
+                        (new Para())->items([
+                            (new Submit(['s2_init'], __('Learn from old messages')))
+                                ->disabled($learned == $nb_comm),
+                            (new Hidden(['action'], 'oldmsg')),
+                            App::nonce()->formNonce(),
+                        ]),
+                    ]),
+                (new Text('h5', __('Maintenance'))),
+                (new Form('spamplemousse2-maintenance-form'))
+                    ->action($url)
+                    ->method('post')
+                    ->fields([
+                        (new Para())->items([
+                            (new Submit(['s2_maintenance'], __('Cleanup'))),
+                            (new Hidden(['action'], 'cleanup')),
+                            App::nonce()->formNonce(),
+                        ]),
+                    ]),
+                (new Text('h5', __('Reset filter'))),
+                (new Form('spamplemousse2-reset-form'))
+                    ->action($url)
+                    ->method('post')
+                    ->fields([
+                        (new Para())->items([
+                            (new Submit(['s2_reset'], __('Delete all learned data'))),
+                            (new Hidden(['action'], 'reset')),
+                            App::nonce()->formNonce(),
+                        ]),
+                    ]),
             ])
-            ->render();
-
-        $content .= '<h5>' . __('Maintenance') . '</h5>';
-        $content .= (new Form('spamplemousse2-maintenance-form'))
-            ->action($url)
-            ->method('post')
-            ->fields([
-                (new Para())->items([
-                    (new Submit(['s2_maintenance'], __('Cleanup'))),
-                    (new Hidden(['action'], 'cleanup')),
-                    App::nonce()->formNonce(),
-                ]),
-            ])
-            ->render();
-
-        $content .= '<h5>' . __('Reset filter') . '</h5>';
-
-        return $content . (new Form('spamplemousse2-reset-form'))
-            ->action($url)
-            ->method('post')
-            ->fields([
-                (new Para())->items([
-                    (new Submit(['s2_reset'], __('Delete all learned data')))
-                        ->extra('onclick="return(confirm(\'' . __('Are you sure?') . '\'));"'),
-                    (new Hidden(['action'], 'reset')),
-                    App::nonce()->formNonce(),
-                ]),
-            ])
-            ->render();
+        ->render();
     }
 
     /**
