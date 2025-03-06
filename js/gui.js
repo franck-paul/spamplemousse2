@@ -1,4 +1,4 @@
-/*global $, dotclear, progressUpdate */
+/*global dotclear */
 'use strict';
 
 dotclear.ready(() => {
@@ -6,9 +6,7 @@ dotclear.ready(() => {
   const reset = document.querySelector('[name="s2_reset"]');
   if (reset) {
     reset.addEventListener('click', (event) => {
-      if (window.confirm(data.msg_reset)) return true;
-      event.preventDefault();
-      return false;
+      return dotclear.confirm(data.msg_reset, event);
     });
   }
 });

@@ -26,5 +26,6 @@ $this->registerModule(
         'details'    => 'https://open-time.net/?q=spamplemousse2',
         'support'    => 'https://github.com/franck-paul/spamplemousse2',
         'repository' => 'https://raw.githubusercontent.com/franck-paul/spamplemousse2/main/dcstore.xml',
+        'license'    => 'gpl2',
     ]
 );
