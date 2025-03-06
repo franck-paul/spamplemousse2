@@ -15,9 +15,9 @@ $this->registerModule(
     'Spamplemousse2',
     'A bayesian spam filter for dotclear',
     'Alain Vagner and contributors',
-    '8.1',
+    '8.2',
     [
-        'date'        => '2025-02-19T22:00:44+0100',
+        'date'        => '2025-03-06T16:42:54+0100',
         'requires'    => [['core', '2.33']],
         'type'        => 'plugin',
         'priority'    => 100,
