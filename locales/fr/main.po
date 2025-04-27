@@ -1,10 +1,10 @@
 # SOME DESCRIPTIVE TITLE.
 # This file is put in the public domain.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 # Translators:
-# Franck Paul <carnet.franck.paul@gmail.com>, 2023
-#
+# Franck Paul <carnet.franck.paul@gmail.com>, 2025
+# 
 #, fuzzy
 msgid ""
 msgstr ""
@@ -12,20 +12,20 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-04-27 16:12+0200\n"
 "PO-Revision-Date: 2023-05-17 11:40+0000\n"
-"Last-Translator: Franck Paul <carnet.franck.paul@gmail.com>, 2023\n"
+"Last-Translator: Franck Paul <carnet.franck.paul@gmail.com>, 2025\n"
 "Language-Team: French (https://app.transifex.com/open-time/teams/109573/fr/)\n"
-"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 msgid "A bayesian filter"
 msgstr "Un filtre bayésien"
 
-#, fuzzy, php-format
+#, php-format
 msgid "Filtered by %1$s, actual spamminess: %2$s %%"
-msgstr "Filtré par %s, spamitude actuelle : %s %%"
+msgstr "Filtré par %1$s, spammeur : %2$s %%"
 
 msgid "Cleanup successful."
 msgstr "Nettoyage réussi."
@@ -73,17 +73,17 @@ msgid "Delete all learned data"
 msgstr "Supprimer toutes les données apprises"
 
 msgid "Fields"
-msgstr ""
+msgstr "Champs"
 
 msgid "All database fields in table"
-msgstr ""
+msgstr "Tous les champs de la base de données dans la table"
 
 msgid "delete selected fields"
-msgstr ""
+msgstr "supprimer les champs sélectionnés"
 
 #, php-format
 msgid "delete \"%s\" fields"
-msgstr ""
+msgstr "supprimer les champs \"%s\"."
 
 msgid "Return"
 msgstr "Retour"
