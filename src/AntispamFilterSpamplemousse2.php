@@ -80,7 +80,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
 
         $p = round($p * 100);
 
-        return sprintf(__('Filtered by %s, actual spamminess: %s %%'), $this->guiLink(), $p);
+        return sprintf(__('Filtered by %1$s, actual spamminess: %2$s %%'), $this->guiLink(), $p);
     }
 
     /**
