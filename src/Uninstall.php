@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief spamplemousse2, a plugin for Dotclear 2
  *
@@ -40,7 +41,7 @@ class Uninstall extends Process
         // $var   = My::id(); // Var sub-folder
 
         // Database table name
-        $table = App::con()->prefix() . 'spam_token';
+        $table = Bayesian::SPAM_TOKEN_TABLE_NAME;
 
         $user_actions = [
 
