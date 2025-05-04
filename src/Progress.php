@@ -21,6 +21,7 @@ use Dotclear\Helper\Html\Form\Link;
 use Dotclear\Helper\Html\Form\Note;
 use Dotclear\Helper\Html\Form\Para;
 use Dotclear\Helper\Html\Form\Set;
+use Dotclear\Helper\Html\Form\Span;
 use Dotclear\Helper\Html\Form\Submit;
 use Dotclear\Helper\Html\Form\Text;
 use Dotclear\Helper\Html\XmlTag;
@@ -158,7 +159,7 @@ class Progress
                 ->separator(' ')
                 ->items([
                     (new Text(null, __('Time remaining:'))),
-                    (new Text('span', '...'))
+                    (new Span('...'))
                         ->id('eta'),
                 ]);
 
