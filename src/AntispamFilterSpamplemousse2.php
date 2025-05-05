@@ -27,6 +27,7 @@ use Dotclear\Helper\Html\Form\Li;
 use Dotclear\Helper\Html\Form\Note;
 use Dotclear\Helper\Html\Form\Para;
 use Dotclear\Helper\Html\Form\Set;
+use Dotclear\Helper\Html\Form\Strong;
 use Dotclear\Helper\Html\Form\Submit;
 use Dotclear\Helper\Html\Form\Text;
 use Dotclear\Helper\Html\Form\Ul;
@@ -222,7 +223,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             $percent    = ($learned - $errors) / $learned * 100;
             $accuracy[] = (new Li())
                 ->items([
-                    (new Text('strong', __('Accuracy:') . ' ' . sprintf('%.02f %%', $percent))),
+                    (new Strong(__('Accuracy:') . ' ' . sprintf('%.02f %%', $percent))),
                 ]);
         }
 
