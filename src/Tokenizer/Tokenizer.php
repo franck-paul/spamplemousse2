@@ -142,7 +142,7 @@ abstract class Tokenizer
      */
     public function default_tokenize_token(array $t, string $prefix = '', string $delim = ''): array
     {
-        return array_filter($this->default_tokenize($t, $prefix, 'token', $delim), static fn ($value): bool => is_array($value));
+        return array_filter($this->default_tokenize($t, $prefix, 'token', $delim), static fn (array|string $value): bool => is_array($value));
     }
 
     /**
@@ -156,7 +156,7 @@ abstract class Tokenizer
      */
     public function default_tokenize_string(array $t, string $prefix = '', string $delim = ''): array
     {
-        return array_filter($this->default_tokenize($t, $prefix, 'string', $delim), static fn ($value): bool => is_string($value));
+        return array_filter($this->default_tokenize($t, $prefix, 'string', $delim), static fn (array|string $value): bool => is_string($value));
     }
 
     /**
