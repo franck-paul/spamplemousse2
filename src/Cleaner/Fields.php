@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief spamplemousse2, a plugin for Dotclear 2
  *
@@ -63,8 +64,8 @@ class Fields extends CleanerParent
             [$table, $field] = explode(PATH_SEPARATOR, $ns);
 
             if ($table && $field) {
-                $sql = 'ALTER TABLE ' . App::con()->prefix() . $table . ' DROP COLUMN ' . $field;
-                App::con()->execute($sql);
+                $sql = 'ALTER TABLE ' . App::db()->con()->prefix() . $table . ' DROP COLUMN ' . $field;
+                App::db()->con()->execute($sql);
             }
 
             return true;

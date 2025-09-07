@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief spamplemousse2, a plugin for Dotclear 2
  *
@@ -16,10 +17,12 @@ namespace Dotclear\Plugin\spamplemousse2;
 
 use ArrayObject;
 use Dotclear\App;
-use Dotclear\Core\Process;
+use Dotclear\Helper\Process\TraitProcess;
 
-class Prepend extends Process
+class Prepend
 {
+    use TraitProcess;
+
     public static function init(): bool
     {
         return self::status(My::checkContext(My::PREPEND));
@@ -32,13 +35,13 @@ class Prepend extends Process
         }
 
         App::behavior()->addBehaviors([
-            'AntispamInitFilters' => static function (ArrayObject $spamfilters) : void {
+            'AntispamInitFilters' => static function (ArrayObject $spamfilters): void {
                 $spamfilters->append(AntispamFilterSpamplemousse2::class);
             },
         ]);
 
         // Add cleaners to Uninstaller
-        App::behavior()->addBehavior('UninstallerCleanersConstruct', static function (\Dotclear\Plugin\Uninstaller\CleanersStack $cleaners) : void {
+        App::behavior()->addBehavior('UninstallerCleanersConstruct', static function (\Dotclear\Plugin\Uninstaller\CleanersStack $cleaners): void {
             $cleaners
                 ->set(new Cleaner\Fields())
             ;

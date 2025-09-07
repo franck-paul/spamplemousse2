@@ -48,7 +48,7 @@ class Progress
      * @param      string                       $title       The title of the page
      * @param      string                       $urlprefix   The prefix for all urls
      * @param      string                       $urlreturn   The URL for quitting the interface
-     * @param      array{0:string, 1:string}    $func        The Static method to call
+     * @param      list{0:string, 1:string}     $func        The Static method to call
      * @param      int                          $start       The Id of the starting point
      * @param      int                          $stop        The Id of the end point
      * @param      int                          $baseinc     The number of items to process on each loop

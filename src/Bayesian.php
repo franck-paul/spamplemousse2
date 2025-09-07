@@ -48,7 +48,7 @@ class Bayesian
 
     public function __construct()
     {
-        $this->table = App::con()->prefix() . self::SPAM_TOKEN_TABLE_NAME;
+        $this->table = App::db()->con()->prefix() . self::SPAM_TOKEN_TABLE_NAME;
         /* valid values for training_mode are  :
             'TEFT' : train everything
                 + works well if the amount of spam is not greater than 80% of the amount of ham
@@ -313,8 +313,8 @@ class Bayesian
 
         foreach ($tok as $i) {
             $p      = $this->val_hapax;
-            $strReq = 'SELECT token_nham, token_nspam, token_p FROM ' . $this->table . ' WHERE token_id = \'' . App::con()->escapeStr($i) . '\'';
-            $rs     = new MetaRecord(App::con()->select($strReq));
+            $strReq = 'SELECT token_nham, token_nspam, token_p FROM ' . $this->table . ' WHERE token_id = \'' . App::db()->con()->escapeStr($i) . '\'';
+            $rs     = new MetaRecord(App::db()->con()->select($strReq));
             if (!$rs->isEmpty()) {
                 $p = $rs->token_p;
             }
@@ -339,18 +339,18 @@ class Bayesian
         }
 
         $strReq    = 'SELECT COUNT(token_nham) FROM ' . $this->table;
-        $rs        = new MetaRecord(App::con()->select($strReq));
+        $rs        = new MetaRecord(App::db()->con()->select($strReq));
         $total_ham = $rs->f(0);
 
         $strReq     = 'SELECT COUNT(token_nspam) FROM ' . $this->table;
-        $rs         = new MetaRecord(App::con()->select($strReq));
+        $rs         = new MetaRecord(App::db()->con()->select($strReq));
         $total_spam = $rs->f(0);
 
         $token = null;
 
         # we determine if the token is already in the dataset
-        $strReq = 'SELECT token_nham, token_nspam, token_p, token_mature FROM ' . $this->table . ' WHERE token_id = \'' . App::con()->escapeStr($t) . '\'';
-        $rs     = new MetaRecord(App::con()->select($strReq));
+        $strReq = 'SELECT token_nham, token_nspam, token_p, token_mature FROM ' . $this->table . ' WHERE token_id = \'' . App::db()->con()->escapeStr($t) . '\'';
+        $rs     = new MetaRecord(App::db()->con()->select($strReq));
 
         $known_token = false;
         if (!$rs->isEmpty()) {
@@ -426,13 +426,13 @@ class Bayesian
                 $maturity = ($nr >= $this->tum_maturity) ? 1 : 0;
                 $strReq   = 'UPDATE ' . $this->table . ' SET token_nham=' . $nham . ', token_nspam=' .
                         $nspam . ', token_mdate=\'' . date('Y-m-d H:i:s') . '\', token_p=\'' .
-                        $p . '\', token_mature=\'' . $maturity . '\' WHERE token_id=\'' . App::con()->escapeStr($token['token_id']) . '\'';
-                App::con()->execute($strReq);
+                        $p . '\', token_mature=\'' . $maturity . '\' WHERE token_id=\'' . App::db()->con()->escapeStr($token['token_id']) . '\'';
+                App::db()->con()->execute($strReq);
             } else {
                 $strReq = 'UPDATE ' . $this->table . ' SET token_nham=' . $nham . ', token_nspam=' .
                         $nspam . ', token_mdate=\'' . date('Y-m-d H:i:s') . '\', token_p=\'' .
-                        $p . '\' WHERE token_id=\'' . App::con()->escapeStr($token['token_id']) . '\'';
-                App::con()->execute($strReq);
+                        $p . '\' WHERE token_id=\'' . App::db()->con()->escapeStr($token['token_id']) . '\'';
+                App::db()->con()->execute($strReq);
             }
         }
 
@@ -448,8 +448,8 @@ class Bayesian
 
             $p = $this->val_hapax;
 
-            $strReq = 'INSERT INTO ' . $this->table . ' (token_id, token_nham, token_nspam, token_mdate, token_p) VALUES (\'' . App::con()->escapeStr($t) . '\',' . $nham . ',' . $nspam . ',\'' . date('Y-m-d H:i:s') . '\' ,\'' . $p . '\')';
-            App::con()->execute($strReq);
+            $strReq = 'INSERT INTO ' . $this->table . ' (token_id, token_nham, token_nspam, token_mdate, token_p) VALUES (\'' . App::db()->con()->escapeStr($t) . '\',' . $nham . ',' . $nspam . ',\'' . date('Y-m-d H:i:s') . '\' ,\'' . $p . '\')';
+            App::db()->con()->execute($strReq);
         }
     }
 
@@ -579,7 +579,7 @@ class Bayesian
             $bayes = App::backend()->spamplemousse2_bayes;
         }
 
-        $rs = new MetaRecord(App::con()->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . $limit . ' OFFSET ' . $offset));
+        $rs = new MetaRecord(App::db()->con()->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . $limit . ' OFFSET ' . $offset));
 
         while ($rs->fetch()) {
             if ((int) $rs->comment_bayes === 0) {
@@ -590,8 +590,8 @@ class Bayesian
 
                 $bayes->train((string) $rs->comment_author, (string) $rs->comment_email, (string) $rs->comment_site, (string) $rs->comment_ip, (string) $rs->comment_content, $spam);
 
-                $req = 'UPDATE ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
-                App::con()->execute($req);
+                $req = 'UPDATE ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
+                App::db()->con()->execute($req);
             }
         }
     }
@@ -602,22 +602,22 @@ class Bayesian
     public function cleanup(): void
     {
         $delim = '';
-        if (App::con()->syntax() === 'postgresql') {
+        if (App::db()->con()->syntax() === 'postgresql') {
             $delim = '\'';
         }
 
         # delete data stale for 6 months
         $req = 'DELETE FROM ' . $this->table . ' WHERE (NOW() - INTERVAL ' . $delim . '6 MONTH' . $delim . ') > token_mdate';
-        App::con()->execute($req);
+        App::db()->con()->execute($req);
 
         # delete all hapaxes stale for 15 days
         $req = 'DELETE FROM ' . $this->table . ' WHERE  (token_nham +2 * token_nspam ) < 5 AND (NOW() - INTERVAL ' . $delim . '15 DAY' . $delim . ') > token_mdate';
-        App::con()->execute($req);
+        App::db()->con()->execute($req);
 
         # if in TUM mode, delete all matured data between 0.3 and 0.7
         if ($this->training_mode === 'TUM') {
             $req = 'DELETE FROM ' . $this->table . ' WHERE token_p > 0.3 AND token_p < 0.7 AND token_mature = 1';
-            App::con()->execute($req);
+            App::db()->con()->execute($req);
         }
     }
 
@@ -626,10 +626,10 @@ class Bayesian
      */
     public function resetFilter(): void
     {
-        $req = 'UPDATE ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' SET comment_bayes = 0, comment_bayes_err = 0';
-        App::con()->execute($req);
+        $req = 'UPDATE ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' SET comment_bayes = 0, comment_bayes_err = 0';
+        App::db()->con()->execute($req);
         $req = 'DELETE FROM ' . $this->table;
-        App::con()->execute($req);
+        App::db()->con()->execute($req);
     }
 
     /**
@@ -640,8 +640,8 @@ class Bayesian
     public function getNumLearnedComments(): int
     {
         $result = 0;
-        $req    = 'SELECT COUNT(comment_id) FROM ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
-        $rs     = new MetaRecord(App::con()->select($req));
+        $req    = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
+        $rs     = new MetaRecord(App::db()->con()->select($req));
         if ($rs->fetch()) {
             $result = (int) $rs->f(0);
         }
@@ -657,8 +657,8 @@ class Bayesian
     public function getNumErrorComments(): int
     {
         $result = 0;
-        $req    = 'SELECT COUNT(comment_id) FROM ' . App::con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
-        $rs     = new MetaRecord(App::con()->select($req));
+        $req    = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
+        $rs     = new MetaRecord(App::db()->con()->select($req));
         if ($rs->fetch()) {
             $result = (int) $rs->f(0);
         }
@@ -675,7 +675,7 @@ class Bayesian
     {
         $result = 0;
         $req    = 'SELECT COUNT(token_id) FROM ' . $this->table;
-        $rs     = new MetaRecord(App::con()->select($req));
+        $rs     = new MetaRecord(App::db()->con()->select($req));
         if ($rs->fetch()) {
             $result = (int) $rs->f(0);
         }
