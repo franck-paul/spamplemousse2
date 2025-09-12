@@ -313,6 +313,7 @@ class Bayesian
 
         foreach ($tok as $i) {
             $p      = $this->val_hapax;
+            $i      = $this->sanitizeToken($i);
             $strReq = 'SELECT token_nham, token_nspam, token_p FROM ' . $this->table . ' WHERE token_id = \'' . App::db()->con()->escapeStr($i) . '\'';
             $rs     = new MetaRecord(App::db()->con()->select($strReq));
             if (!$rs->isEmpty()) {
@@ -349,6 +350,7 @@ class Bayesian
         $token = null;
 
         # we determine if the token is already in the dataset
+        $t      = $this->sanitizeToken($t);
         $strReq = 'SELECT token_nham, token_nspam, token_p, token_mature FROM ' . $this->table . ' WHERE token_id = \'' . App::db()->con()->escapeStr($t) . '\'';
         $rs     = new MetaRecord(App::db()->con()->select($strReq));
 
@@ -369,7 +371,13 @@ class Bayesian
         }
 
         if ($known_token) {
-            $token = ['token_id' => $t, 'token_nham' => $rs->token_nham, 'token_nspam' => $rs->token_nspam, 'token_p' => $rs->token_p, 'token_mature' => $rs->token_mature];
+            $token = [
+                'token_id'     => $t,
+                'token_nham'   => $rs->token_nham,
+                'token_nspam'  => $rs->token_nspam,
+                'token_p'      => $rs->token_p,
+                'token_mature' => $rs->token_mature,
+            ];
         }
 
         # we compute the new values for total_spam and total_ham
@@ -681,5 +689,14 @@ class Bayesian
         }
 
         return $result;
+    }
+
+    private function sanitizeToken(string $token): string
+    {
+        if (App::plugins()->moduleExists('utf8mb4')) {
+            return \Dotclear\Plugin\utf8mb4\Helper::doEncoding($token);
+        }
+
+        return $token;
     }
 }
