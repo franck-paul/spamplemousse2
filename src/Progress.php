@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 namespace Dotclear\Plugin\spamplemousse2;
 
-use Dotclear\Core\Backend\Page;
+use Dotclear\App;
 use Dotclear\Helper\Html\Form\Form;
 use Dotclear\Helper\Html\Form\Link;
 use Dotclear\Helper\Html\Form\Note;
@@ -131,7 +131,7 @@ class Progress
                 $this->eta = 100 * $this->total_elapsed / $this->percent - $this->total_elapsed;
             }
 
-            $head = Page::jsJson('spamplemousse2', [
+            $head = App::backend()->page()->jsJson('spamplemousse2', [
                 'funcClass'  => $this->func[0],
                 'funcMethod' => $this->func[1],
                 'pos'        => $this->pos,

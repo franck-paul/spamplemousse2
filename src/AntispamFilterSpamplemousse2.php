@@ -16,7 +16,6 @@ declare(strict_types=1);
 namespace Dotclear\Plugin\spamplemousse2;
 
 use Dotclear\App;
-use Dotclear\Core\Backend\Page;
 use Dotclear\Database\Cursor;
 use Dotclear\Database\MetaRecord;
 use Dotclear\Database\Statement\SelectStatement;
@@ -229,7 +228,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
 
         $items[] = (new Text(
             null,
-            Page::jsJson('spamplemousse2', [
+            App::backend()->page()->jsJson('spamplemousse2', [
                 'msg_reset' => __('Are you sure?'),
             ]) .
             My::jsLoad('gui.js')
