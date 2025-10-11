@@ -24,7 +24,9 @@ use Dotclear\Plugin\spamplemousse2\Tokenizer\Redundancies;
 use Dotclear\Plugin\spamplemousse2\Tokenizer\Url;
 
 /**
-This class implements all the bayesian filtering logic.
+ * This class implements all the bayesian filtering logic.
+ *
+ * @todo switch to SqlStatement
  */
 class Bayesian
 {
@@ -487,11 +489,11 @@ class Bayesian
      */
     private function compute_proba(int $nham, int $nspam, int $total_ham, int $total_spam): float
     {
-        if ($total_spam == 0) {
+        if ($total_spam === 0) {
             ++$total_spam;
         }
 
-        if ($total_ham == 0) {
+        if ($total_ham === 0) {
             ++$total_ham;
         }
 
@@ -542,7 +544,7 @@ class Bayesian
 
         $n = count($proba);
         $i = 0.5;
-        if ($n != 0) {
+        if ($n !== 0) {
             $prod1 = 1;
             $prod2 = 1;
             foreach ($proba as $p) {

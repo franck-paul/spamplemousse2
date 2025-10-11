@@ -95,7 +95,7 @@ abstract class Tokenizer
 
                             # matched tokens handling
                             $i = 1;
-                            while ($i != $n) {
+                            while ($i !== $n) {
                                 # we compute here the new prefix
                                 $p = !empty($pre) && $this->prefix !== '' ? $pre . '*' . $this->prefix : $pre . $this->prefix;
                                 if (!is_null($new_token = $this->create_token($matches[$i], $p, true))) {

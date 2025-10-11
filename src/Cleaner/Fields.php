@@ -24,6 +24,8 @@ use Dotclear\Plugin\Uninstaller\{
 
 /**
  * Cleaner for Adaptive images cache directory.
+ *
+ * @todo switch to SqlStatement
  */
 class Fields extends CleanerParent
 {
