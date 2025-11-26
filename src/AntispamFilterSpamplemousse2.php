@@ -100,7 +100,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
      * @param      int     $post_id  The comment post_id
      * @param      string  $status   The comment status
      */
-    public function isSpam(string $type, ?string $author, ?string $email, ?string $site, ?string $ip, ?string $content, ?int $post_id, string &$status)
+    public function isSpam(string $type, ?string $author, ?string $email, ?string $site, ?string $ip, ?string $content, ?int $post_id, string &$status): ?bool
     {
         $spamFilter = new Bayesian();
         $spam       = $spamFilter->handle_new_message((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content);
