@@ -1,11 +1,11 @@
 <modules xmlns:da="http://dotaddict.org/da/">
   <module id="spamplemousse2">
     <name>Spamplemousse2</name>
-    <version>10.4.1</version>
+    <version>10.4.2</version>
     <author>Alain Vagner</author>
     <desc>A bayesian spam filter for dotclear</desc>
-    <date>2025-11-26T13:06:26+0100</date>
-    <file>https://github.com/franck-paul/spamplemousse2/releases/download/10.4.1/plugin-spamplemousse2-10.4.1.zip</file>
+    <date>2025-12-11T16:53:41+0100</date>
+    <file>https://github.com/franck-paul/spamplemousse2/releases/download/10.4.2/plugin-spamplemousse2-10.4.2.zip</file>
     <da:dcmin>2.36</da:dcmin>
     <da:details>https://open-time.net/?q=spamplemousse2</da:details>
     <da:support>https://github.com/franck-paul/spamplemousse2</da:support>
