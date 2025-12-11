@@ -25,13 +25,12 @@ class BackendRest
     /**
      * Posts a progress.
      *
-     * @param      mixed                    $unused     Unused
      * @param      array<string, string>    $get        The get parameters
      * @param      array<string, string>    $post       The post parameters
      *
      * @return     XmlTag  The xml message.
      */
-    public static function postProgress(mixed $unused, array $get, array $post): XmlTag
+    public static function postProgress(array $get, array $post): XmlTag
     {
         $title      = '';
         $urlprefix  = '';
