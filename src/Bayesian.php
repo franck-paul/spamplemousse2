@@ -653,7 +653,7 @@ class Bayesian
         $req    = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
         $rs     = new MetaRecord(App::db()->con()->select($req));
         if ($rs->fetch()) {
-            $result = (int) $rs->f(0);
+            return (int) $rs->f(0);
         }
 
         return $result;
@@ -670,7 +670,7 @@ class Bayesian
         $req    = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
         $rs     = new MetaRecord(App::db()->con()->select($req));
         if ($rs->fetch()) {
-            $result = (int) $rs->f(0);
+            return (int) $rs->f(0);
         }
 
         return $result;
@@ -687,7 +687,7 @@ class Bayesian
         $req    = 'SELECT COUNT(token_id) FROM ' . $this->table;
         $rs     = new MetaRecord(App::db()->con()->select($req));
         if ($rs->fetch()) {
-            $result = (int) $rs->f(0);
+            return (int) $rs->f(0);
         }
 
         return $result;
