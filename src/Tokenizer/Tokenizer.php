@@ -30,9 +30,9 @@ abstract class Tokenizer
      *
      * @param      string            $str    The string
      *
-     * @return     array<int, string>|int|string     Array of strings, containing : (left string, match1, match2, ..., right string)
+     * @return     array<string>|int     Array of strings will contain : (left string, match1, match2, ..., right string)
      */
-    abstract protected function match(string $str);
+    abstract protected function match(string $str): array|int;
 
     /**
      * Creates an element of the token array.
@@ -41,9 +41,9 @@ abstract class Tokenizer
      * @param      string  $prefix  The prefix associated to the $elem string
      * @param      bool    $final   The final state of the token
      *
-     * @return     array<string, mixed>|null   The element of the token array
+     * @return     array{elem: string, prefix: string, final: bool}|null   The element of the token array
      */
-    public function create_token(string $elem, string $prefix, bool $final = false)
+    public function create_token(string $elem, string $prefix, bool $final = false): ?array
     {
         $token = null;
 
@@ -65,22 +65,21 @@ abstract class Tokenizer
     /**
      * Tokenizes strings not finalized in an array of token, based on a specified matching method
      *
-     * @param      array<int, array<string, mixed>>  $t      Array of tokens
+     * @param      array<array-key, array{elem: string, prefix: string, final: bool}>  $tokens      Array of tokens
      *
-     * @return     array<int, array<string, mixed>>  Array of tokens
+     * @return     array<array-key, array{elem: string, prefix: string, final: bool}>  Array of tokens
      */
-    public function tokenize(array $t): array
+    public function tokenize(array $tokens): array
     {
         $tab = [];
-        foreach ($t as $e) {
+        foreach ($tokens as $token) {
             # we are working on non-finalized strings
-            if (!$e['final']) {
-                $s      = $e['elem'];
-                $pre    = $e['prefix'];
+            if (!$token['final']) {
+                $remain = $token['elem'];
+                $pre    = $token['prefix'];
                 $cur    = [];
-                $remain = $s;
                 do {
-                    if ($remain != '') {
+                    if ($remain !== '') {
                         # call the matching method
                         $matches = $this->match($remain);
 
@@ -120,11 +119,11 @@ abstract class Tokenizer
                             }
                         }
                     }
-                } while ($remain != '');
+                } while ($remain !== '');
 
                 $tab = [...$tab, ...$cur];
             } else {
-                $tab[] = $e;
+                $tab[] = $token;
             }
         }
 
@@ -134,11 +133,11 @@ abstract class Tokenizer
     /**
      * Default tokenization of a string, based on a fixed list of delimiters
      *
-     * @param      array<int, array<string, mixed>>     $t        Array of tokens
+     * @param      array<array-key, array{elem: string, prefix: string, final: bool}>     $t        Array of tokens
      * @param      string                               $prefix   The prefix to add to the new tokens
      * @param      string                               $delim    List of delimiters to use for the tokenization
      *
-     * @return     array<array<string, mixed>>  Array of tokens
+     * @return     array<array-key, array{elem: string, prefix: string, final: bool}>  Array of tokens
      */
     public function default_tokenize_token(array $t, string $prefix = '', string $delim = ''): array
     {
@@ -148,7 +147,7 @@ abstract class Tokenizer
     /**
      * Default tokenization of a string, based on a fixed list of delimiters
      *
-     * @param      array<int, array<string, mixed>>     $t        Array of tokens
+     * @param      array<array-key, array{elem: string, prefix: string, final: bool}>     $t        Array of tokens
      * @param      string                               $prefix   The prefix to add to the new tokens
      * @param      string                               $delim    List of delimiters to use for the tokenization
      *
@@ -162,13 +161,13 @@ abstract class Tokenizer
     /**
      * Default tokenization of a string, based on a fixed list of delimiters
      *
-     * @param      array<int, array<string, mixed>>     $t        Array of tokens
+     * @param      array<array-key, array{elem: string, prefix: string, final: bool}>     $t        Array of tokens
      * @param      string                               $prefix   The prefix to add to the new tokens
      * @param      string                               $type     The result type : 'token' or 'string', returns an array of tokens
      *                                                            or an array of string (like match_url)
      * @param      string                               $delim    List of delimiters to use for the tokenization
      *
-     * @return     array<array<string, mixed>>|array<string>  Array of tokens or array of strings
+     * @return     array<array-key, array{elem: string, prefix: string, final: bool}>|array<string>  Array of tokens or array of strings
      */
     public function default_tokenize(array $t, string $prefix = '', string $type = 'token', string $delim = ''): array
     {
@@ -193,8 +192,10 @@ abstract class Tokenizer
                             if ($sub !== '') {
                                 if ($type === 'token') {
                                     # new prefix
-                                    $p     = !empty($pre) && $prefix !== '' ? $pre . '*' . $prefix : $pre . $prefix;
-                                    $tab[] = $this->create_token($sub, $p, true);
+                                    $p = !empty($pre) && $prefix !== '' ? $pre . '*' . $prefix : $pre . $prefix;
+                                    if (!is_null($new_token = $this->create_token($sub, $p, true))) {
+                                        $tab[] = $new_token;
+                                    }
                                 } else {
                                     $tab[] = $sub;
                                 }

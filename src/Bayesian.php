@@ -288,7 +288,7 @@ class Bayesian
     /**
      * Gives a simple array of strings from an array of tokens
      *
-     * @param      array<array<string, mixed>>  $tok    The Array of tokens
+     * @param      array<array-key, array{elem: string, prefix: string, final: bool}>  $tok    The Array of tokens
      *
      * @return     array<string>  Array of strings
      */
@@ -307,7 +307,7 @@ class Bayesian
      *
      * @param      array<string>  $tok    The Array of tokens
      *
-     * @return     array<string>  The Array of probabilities.
+     * @return     array<float>  The Array of probabilities.
      */
     private function get_probabilities(array $tok): array
     {
@@ -318,8 +318,8 @@ class Bayesian
             $i      = $this->sanitizeToken($i);
             $strReq = 'SELECT token_nham, token_nspam, token_p FROM ' . $this->table . ' WHERE token_id = \'' . App::db()->con()->escapeStr($i) . '\'';
             $rs     = new MetaRecord(App::db()->con()->select($strReq));
-            if (!$rs->isEmpty()) {
-                $p = $rs->token_p;
+            if (!$rs->isEmpty() && is_numeric($rs->token_p)) {
+                $p = (float) $rs->token_p;
             }
 
             $proba[] = $p;
@@ -343,13 +343,11 @@ class Bayesian
 
         $strReq    = 'SELECT COUNT(token_nham) FROM ' . $this->table;
         $rs        = new MetaRecord(App::db()->con()->select($strReq));
-        $total_ham = $rs->f(0);
+        $total_ham = is_numeric($rs->f(0)) ? (int) $rs->f(0) : 0;
 
         $strReq     = 'SELECT COUNT(token_nspam) FROM ' . $this->table;
         $rs         = new MetaRecord(App::db()->con()->select($strReq));
-        $total_spam = $rs->f(0);
-
-        $token = null;
+        $total_spam = is_numeric($rs->f(0)) ? (int) $rs->f(0) : 0;
 
         # we determine if the token is already in the dataset
         $t      = $this->sanitizeToken($t);
@@ -372,7 +370,11 @@ class Bayesian
             }
         }
 
+        $token = null;
         if ($known_token) {
+            /**
+             * @var array{token_id: string, token_nham: int, token_nspam: int, token_p: float, token_mature: bool} $token
+             */
             $token = [
                 'token_id'     => $t,
                 'token_nham'   => $rs->token_nham,
@@ -384,25 +386,36 @@ class Bayesian
 
         # we compute the new values for total_spam and total_ham
         if ($spam) {
-            $total_spam += $known_token ? 1 : 0;
             $total_spam += $known_token ? 0 : 1;
             if ($retrain) {
                 $total_ham -= $known_token ? 1 : 0;
             }
         } else {
-            $total_ham += $known_token ? 1 : 0;
             $total_ham += $known_token ? 0 : 1;
             if ($retrain) {
                 $total_spam -= $known_token ? 1 : 0;
             }
         }
 
-        if ($known_token && (($this->training_mode !== 'TUM') || ($token['token_mature'] != 1) || $retrain)) {
+        if (is_array($token) && $known_token && (($this->training_mode !== 'TUM') || ($token['token_mature'] != 1) || $retrain)) {
             # update
             # nr of occurences in each corpuses
+
+            /**
+             * @var int $nspam
+             */
             $nspam = 0;
-            $nham  = 0;
-            $nr    = 0;
+
+            /**
+             * @var int $nham
+             */
+            $nham = 0;
+
+            /**
+             * @var int $nr
+             */
+            $nr = 0;
+
             if ($spam) {
                 $nspam = $token['token_nspam'] + 1;
                 $nham  = $retrain ? $token['token_nham'] - 1 : $token['token_nham'];
@@ -416,12 +429,12 @@ class Bayesian
             # hapaxes handling
             if ($nr < 5) {
                 $p = $this->val_hapax;
-            } elseif ($nham == 0) { # single corpus token handling
+            } elseif ($nham === 0) { # single corpus token handling
                 $p = $this->sct_ham;
-            } elseif ($nspam == 0) {
+            } elseif ($nspam === 0) {
                 $p = $this->sct_spam;
             } else {
-                $p = $this->compute_proba((int) $nham, (int) $nspam, (int) $total_ham, (int) $total_spam);
+                $p = $this->compute_proba($nham, $nspam, $total_ham, $total_spam);
                 if ($p >= 1) {
                     $p = $this->sct_spam;
                 }
@@ -529,7 +542,7 @@ class Bayesian
     /**
      * Computes the final probability of a message using Fisher-Robinson's inverse Chi-Square
      *
-     * @param      array<string>  $proba  The array of probabilities
+     * @param      array<float>  $proba  The array of probabilities
      *
      * @return     float  The resulting probability
      */
@@ -548,7 +561,6 @@ class Bayesian
             $prod1 = 1;
             $prod2 = 1;
             foreach ($proba as $p) {
-                $p = (float) $p;
                 $prod1 *= $p;
                 $prod2 *= (1 - $p);
             }
@@ -592,15 +604,24 @@ class Bayesian
         $rs = new MetaRecord(App::db()->con()->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . $limit . ' OFFSET ' . $offset));
 
         while ($rs->fetch()) {
-            if ((int) $rs->comment_bayes === 0) {
+            $comment_bayes = isset($rs->comment_bayes) && is_numeric($comment_bayes = $rs->comment_bayes) ? (int) $rs->comment_bayes : 0;
+            if ($comment_bayes === 0) {
                 $spam = false;
-                if ($rs->comment_status == App::status()->comment()::JUNK) {
+                if ($rs->comment_status === App::status()->comment()::JUNK) {
                     $spam = true;
                 }
 
-                $bayes->train((string) $rs->comment_author, (string) $rs->comment_email, (string) $rs->comment_site, (string) $rs->comment_ip, (string) $rs->comment_content, $spam);
+                $comment_author  = isset($rs->comment_author)  && is_string($comment_author = $rs->comment_author) ? $comment_author : '';
+                $comment_email   = isset($rs->comment_email)   && is_string($comment_email = $rs->comment_email) ? $comment_email : '';
+                $comment_site    = isset($rs->comment_site)    && is_string($comment_site = $rs->comment_site) ? $comment_site : '';
+                $comment_ip      = isset($rs->comment_ip)      && is_string($comment_ip = $rs->comment_ip) ? $comment_ip : '';
+                $comment_content = isset($rs->comment_content) && is_string($comment_content = $rs->comment_content) ? $comment_content : '';
 
-                $req = 'UPDATE ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $rs->comment_id;
+                $bayes->train($comment_author, $comment_email, $comment_site, $comment_ip, $comment_content, $spam);
+
+                $comment_id = isset($rs->comment_id) && is_numeric($comment_id = $rs->comment_id) ? (int) $comment_id : 0;
+
+                $req = 'UPDATE ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $comment_id;
                 App::db()->con()->execute($req);
             }
         }
@@ -649,14 +670,13 @@ class Bayesian
      */
     public function getNumLearnedComments(): int
     {
-        $result = 0;
-        $req    = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
-        $rs     = new MetaRecord(App::db()->con()->select($req));
-        if ($rs->fetch()) {
+        $req = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
+        $rs  = new MetaRecord(App::db()->con()->select($req));
+        if ($rs->fetch() && is_numeric($rs->f(0))) {
             return (int) $rs->f(0);
         }
 
-        return $result;
+        return 0;
     }
 
     /**
@@ -666,14 +686,13 @@ class Bayesian
      */
     public function getNumErrorComments(): int
     {
-        $result = 0;
-        $req    = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
-        $rs     = new MetaRecord(App::db()->con()->select($req));
-        if ($rs->fetch()) {
+        $req = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
+        $rs  = new MetaRecord(App::db()->con()->select($req));
+        if ($rs->fetch() && is_numeric($rs->f(0))) {
             return (int) $rs->f(0);
         }
 
-        return $result;
+        return 0;
     }
 
     /**
@@ -683,14 +702,13 @@ class Bayesian
      */
     public function getNumLearnedTokens(): int
     {
-        $result = 0;
-        $req    = 'SELECT COUNT(token_id) FROM ' . $this->table;
-        $rs     = new MetaRecord(App::db()->con()->select($req));
-        if ($rs->fetch()) {
+        $req = 'SELECT COUNT(token_id) FROM ' . $this->table;
+        $rs  = new MetaRecord(App::db()->con()->select($req));
+        if ($rs->fetch() && is_numeric($rs->f(0))) {
             return (int) $rs->f(0);
         }
 
-        return $result;
+        return 0;
     }
 
     private function sanitizeToken(string $token): string

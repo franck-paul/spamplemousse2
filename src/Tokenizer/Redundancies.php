@@ -22,10 +22,6 @@ class Redundancies extends Tokenizer
 {
     /**
      * Matches redundancies in a string (example: viagra!!!!!!! becomes viagra!)
-     *
-     * @param      string            $str    The string to analyze
-     *
-     * @return     array<string>|int  Array of strings, containing : (left string, match1, match2, ..., right string)
      */
     protected function match(string $str): array|int
     {

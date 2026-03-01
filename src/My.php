@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @brief spamplemousse2, a plugin for Dotclear 2
  *

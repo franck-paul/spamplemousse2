@@ -68,8 +68,9 @@ class Progress
         private int $pos = 0,
         private readonly string $formparams = ''
     ) {
-        $this->start = empty($_POST['start']) ? $this->start : $_POST['start'];
-        if (isset($_POST['pos']) && $_POST['pos'] != '') {
+        $this->start = empty($_POST['start']) || !is_numeric($_POST['start']) ? $this->start : (int) $_POST['start'];
+
+        if (isset($_POST['pos']) && is_numeric($_POST['pos'])) {
             $this->pos = (int) $_POST['pos'];
         } elseif ($this->pos > 0) {
             $this->first_run = true;
@@ -78,9 +79,11 @@ class Progress
             $this->first_run = true;
         }
 
-        $this->stop          = empty($_POST['stop']) ? $this->stop : (int) $_POST['stop'];
-        $this->total_elapsed = empty($_POST['total_elapsed']) ? 0 : (float) $_POST['total_elapsed'];
-        $this->total_time    = min((float) ini_get('max_execution_time') / 4, 10);  // 10 seconds max between two feedbacks
+        $this->stop = empty($_POST['stop']) || !is_numeric($_POST['stop']) ? $this->stop : (int) $_POST['stop'];
+
+        $this->total_elapsed = empty($_POST['total_elapsed']) || !is_numeric($_POST['total_elapsed']) ? 0 : (float) $_POST['total_elapsed'];
+
+        $this->total_time = min((float) ini_get('max_execution_time') / 4, 10);  // 10 seconds max between two feedbacks
     }
 
     /**

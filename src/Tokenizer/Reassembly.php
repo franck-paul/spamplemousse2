@@ -22,10 +22,6 @@ class Reassembly extends Tokenizer
 {
     /**
      * Matches tokens of length equal to 1 separated only by 1 delimiter
-     *
-     * @param      string            $str    The string to analyze
-     *
-     * @return     array<string>|int  Array of strings, containing : (left string, match1, match2, ..., right string)
      */
     protected function match(string $str): array|int
     {
