@@ -377,10 +377,10 @@ class Bayesian
              */
             $token = [
                 'token_id'     => $t,
-                'token_nham'   => $rs->token_nham,
-                'token_nspam'  => $rs->token_nspam,
-                'token_p'      => $rs->token_p,
-                'token_mature' => $rs->token_mature,
+                'token_nham'   => is_numeric($rs->token_nham) ? (int) $rs->token_nham : 0,
+                'token_nspam'  => is_numeric($rs->token_nspam) ? (int) $rs->token_nspam : 0,
+                'token_p'      => is_numeric($rs->token_p) ? (float) $rs->token_p : 0,
+                'token_mature' => (bool) $rs->token_mature,
             ];
         }
 
