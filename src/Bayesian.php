@@ -32,6 +32,10 @@ class Bayesian
 {
     public const SPAM_TOKEN_TABLE_NAME = 'spam_token';
 
+    public const TRAINING_MODE_TEFT = 'TEFT';
+    public const TRAINING_MODE_TOE  = 'TOE';
+    public const TRAINING_MODE_TUM  = 'TUM';
+
     private readonly string $table;
 
     private float $val_hapax = 0.45;
@@ -44,11 +48,9 @@ class Bayesian
 
     private int $retrain_limit = 5;
 
-    private string $training_mode = 'TUM';
-
     private int $tum_maturity = 20;
 
-    public function __construct()
+    public function __construct(protected string $training_mode = self::TRAINING_MODE_TUM)
     {
         $this->table = App::db()->con()->prefix() . self::SPAM_TOKEN_TABLE_NAME;
         /* valid values for training_mode are  :
@@ -99,7 +101,7 @@ class Bayesian
             $spam = true;
         }
 
-        if ($this->training_mode !== 'TOE') {
+        if ($this->training_mode !== self::TRAINING_MODE_TOE) {
             $this->basic_train($tok, $spam);
             if (App::task()->checkContext('FRONTEND')) {
                 App::frontend()->spamplemousse2_learned = 1;
@@ -130,7 +132,7 @@ class Bayesian
      */
     public function train(string $author, string $email, string $site, string $ip, string $content, bool $spam): void
     {
-        if ($this->training_mode !== 'TOE') {
+        if ($this->training_mode !== self::TRAINING_MODE_TOE) {
             $tok = $this->tokenize($author, $email, $site, $ip, $content);
             $this->basic_train($tok, $spam);
         }
@@ -397,7 +399,8 @@ class Bayesian
             }
         }
 
-        if (is_array($token) && $known_token && (($this->training_mode !== 'TUM') || ($token['token_mature'] != 1) || $retrain)) {
+        $go = is_array($token) && (($this->training_mode !== self::TRAINING_MODE_TUM) || ($token['token_mature'] != 1) || $retrain);
+        if ($known_token && $go) {
             # update
             # nr of occurences in each corpuses
 
@@ -444,7 +447,7 @@ class Bayesian
                 }
             }
 
-            if ($this->training_mode === 'TUM') {
+            if ($this->training_mode === self::TRAINING_MODE_TUM) {
                 # evaluate token maturity
                 $maturity = ($nr >= $this->tum_maturity) ? 1 : 0;
                 $strReq   = 'UPDATE ' . $this->table . ' SET token_nham=' . $nham . ', token_nspam=' .
@@ -646,7 +649,7 @@ class Bayesian
         App::db()->con()->execute($req);
 
         # if in TUM mode, delete all matured data between 0.3 and 0.7
-        if ($this->training_mode === 'TUM') {
+        if ($this->training_mode === self::TRAINING_MODE_TUM) {
             $req = 'DELETE FROM ' . $this->table . ' WHERE token_p > 0.3 AND token_p < 0.7 AND token_mature = 1';
             App::db()->con()->execute($req);
         }
