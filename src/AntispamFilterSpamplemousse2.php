@@ -193,8 +193,8 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             ->from(App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME)
         ;
         $rs = $sql->select();
-        if ($rs && $rs->fetch() && is_numeric($rs->f(0))) {
-            $nb_comm = (int) $rs->f(0);
+        if ($rs instanceof MetaRecord) {
+            $nb_comm = $rs->cardinal();
         }
 
         $learned = 0;

@@ -345,11 +345,11 @@ class Bayesian
 
         $strReq    = 'SELECT COUNT(token_nham) FROM ' . $this->table;
         $rs        = new MetaRecord(App::db()->con()->select($strReq));
-        $total_ham = is_numeric($rs->f(0)) ? (int) $rs->f(0) : 0;
+        $total_ham = $rs->cardinal();
 
         $strReq     = 'SELECT COUNT(token_nspam) FROM ' . $this->table;
         $rs         = new MetaRecord(App::db()->con()->select($strReq));
-        $total_spam = is_numeric($rs->f(0)) ? (int) $rs->f(0) : 0;
+        $total_spam = $rs->cardinal();
 
         # we determine if the token is already in the dataset
         $t      = $this->sanitizeToken($t);
@@ -675,11 +675,8 @@ class Bayesian
     {
         $req = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
         $rs  = new MetaRecord(App::db()->con()->select($req));
-        if ($rs->fetch() && is_numeric($rs->f(0))) {
-            return (int) $rs->f(0);
-        }
 
-        return 0;
+        return $rs->cardinal();
     }
 
     /**
@@ -691,11 +688,8 @@ class Bayesian
     {
         $req = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
         $rs  = new MetaRecord(App::db()->con()->select($req));
-        if ($rs->fetch() && is_numeric($rs->f(0))) {
-            return (int) $rs->f(0);
-        }
 
-        return 0;
+        return $rs->cardinal();
     }
 
     /**
@@ -707,11 +701,8 @@ class Bayesian
     {
         $req = 'SELECT COUNT(token_id) FROM ' . $this->table;
         $rs  = new MetaRecord(App::db()->con()->select($req));
-        if ($rs->fetch() && is_numeric($rs->f(0))) {
-            return (int) $rs->f(0);
-        }
 
-        return 0;
+        return $rs->cardinal();
     }
 
     private function sanitizeToken(string $token): string
