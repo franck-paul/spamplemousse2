@@ -152,7 +152,7 @@ class Progress
                 ->separator(' ')
                 ->items([
                     (new Text(null, __('Progress:'))),
-                    (new Text('progress', sprintf('%d/100', $this->percent)))
+                    (new Text('progress', sprintf('%d/100', (int) $this->percent)))
                         ->id('percent')
                         ->max(100)
                         ->value((int) $this->percent),
@@ -223,11 +223,11 @@ class Progress
             $rsp->insertNode($error_xml);
         } else {
             $percent_xml = new XmlTag('percent');
-            $percent_xml->insertNode(sprintf('%d', $this->percent));
+            $percent_xml->insertNode(sprintf('%d', (int) $this->percent));
             $rsp->insertNode($percent_xml);
             if ($this->percent != 0) {
                 $eta_xml = new XmlTag('eta');
-                $eta_xml->insertNode(sprintf('%d', $this->eta));
+                $eta_xml->insertNode(sprintf('%d', (int) $this->eta));
                 $rsp->insertNode($eta_xml);
             }
 
