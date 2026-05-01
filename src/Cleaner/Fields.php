@@ -49,12 +49,18 @@ class Fields extends CleanerParent
         ));
     }
 
+    /**
+     * @return array{}
+     */
     public function distributed(): array
     {
         return [
         ];
     }
 
+    /**
+     * @return array{}
+     */
     public function values(): array
     {
         return [];
