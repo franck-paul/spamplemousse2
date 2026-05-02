@@ -33,7 +33,9 @@ class Bayesian
     public const SPAM_TOKEN_TABLE_NAME = 'spam_token';
 
     public const TRAINING_MODE_TEFT = 'TEFT';
+
     public const TRAINING_MODE_TOE  = 'TOE';
+
     public const TRAINING_MODE_TUM  = 'TUM';
 
     private readonly string $table;
@@ -365,6 +367,7 @@ class Bayesian
                     // Not spam but already found in spam, we have a problem
                     return;
                 }
+
                 if ($spam && $rs->token_nham > 0) {
                     // Spam but already found in ham, we have a problem
                     return;
