@@ -45,7 +45,7 @@ dotclear.ready(() => {
     }
 
     if ($(data).find('error').length !== 0) {
-      window.alert(`error: ${$(data).find('error').text()}`);
+      globalThis.alert(`error: ${$(data).find('error').text()}`);
       return;
     }
 
