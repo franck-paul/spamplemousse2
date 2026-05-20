@@ -32,18 +32,27 @@ class Fields extends CleanerParent
     public function __construct()
     {
         parent::__construct(new CleanerDescriptor(
-            id:   'fields',
-            name: __('Fields'),
-            desc: __('All database fields in table'),
+            id:   'spamplemousse2_fields',
+            name: __('Comments fields'),
+            desc: __('Spamplemousse2 fields in comments table'),
             actions: [
                 // delete a $ns table:field.
                 new ActionDescriptor(
-                    id:      'delete',
-                    select:  __('delete selected fields'),
-                    query:   __('delete "%s" fields'),
-                    success: __('"%s" table deleted'),
-                    error:   __('Failed to delete "%s" table'),
-                    default: true
+                    id:      'delete_bayes',
+                    select:  __('delete selected field'),
+                    query:   __('delete "%s" field'),
+                    success: __('"%s" field has been succesfully been deleted'),
+                    error:   __('Failed to delete "%s" field'),
+                    default: false
+                ),
+                // delete a $ns table:field.
+                new ActionDescriptor(
+                    id:      'delete_bayes_err',
+                    select:  __('delete selected field'),
+                    query:   __('delete "%s" field'),
+                    success: __('"%s" field has been succesfully been deleted'),
+                    error:   __('Failed to delete "%s" field'),
+                    default: false
                 ),
             ]
         ));
@@ -68,7 +77,7 @@ class Fields extends CleanerParent
 
     public function execute(string $action, string $ns): bool
     {
-        if ($action === 'delete') {
+        if (in_array($action, ['delete_bayes', 'delete_bayes_err'], true)) {
             [$table, $field] = explode(PATH_SEPARATOR, $ns);
 
             if ($table && $field) {

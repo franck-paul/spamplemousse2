@@ -89,9 +89,9 @@ class Uninstall
             ],
 
             // Field (database)
-            'fields' => [
-                ['delete', 'comment:comment_bayes'],        // Delete field
-                ['delete', 'comment:comment_bayes_err'],    // Delete field
+            'spamplemousse2_fields' => [
+                ['delete_bayes', 'comment:comment_bayes'],          // Delete field
+                ['delete_bayes_err', 'comment:comment_bayes_err'],  // Delete field
             ],
 
             // Plugin or Theme
