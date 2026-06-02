@@ -1,10 +1,10 @@
 # SOME DESCRIPTIVE TITLE.
 # This file is put in the public domain.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 # Translators:
-# Franck Paul <contact@open-time.net>, 2025
-#
+# Franck Paul <contact+transifex@open-time.net>, 2026
+# 
 #, fuzzy
 msgid ""
 msgstr ""
@@ -12,12 +12,12 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-05-20 10:22+0200\n"
 "PO-Revision-Date: 2023-05-17 11:40+0000\n"
-"Last-Translator: Franck Paul <contact@open-time.net>, 2025\n"
+"Last-Translator: Franck Paul <contact+transifex@open-time.net>, 2026\n"
 "Language-Team: French (https://app.transifex.com/open-time/teams/109573/fr/)\n"
-"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 msgid "A bayesian filter"
@@ -73,25 +73,25 @@ msgid "Delete all learned data"
 msgstr "Supprimer toutes les données apprises"
 
 msgid "Comments fields"
-msgstr "Champs dans la table des commentaires"
+msgstr "Champs de commentaires"
 
 msgid "Spamplemousse2 fields in comments table"
-msgstr "Champs de Spamplemousse2 dans la table des commentaires"
+msgstr "Spamplemousse2 champs dans la table des commentaires"
 
 msgid "delete selected field"
-msgstr "supprimer les champs sélectionnés"
+msgstr "supprimer le champ sélectionné"
 
 #, php-format
 msgid "delete \"%s\" field"
-msgstr "supprimer le champ \"%s\"."
+msgstr "supprimer le champ \"%s\""
 
 #, php-format
 msgid "\"%s\" field has been succesfully been deleted"
-msgstr "Le champ \"%s\" a été supprimé avec succès"
+msgstr "Le champ \"%s\" a été supprimé avec succès."
 
 #, php-format
 msgid "Failed to delete \"%s\" field"
-msgstr "Impossible de supprimer le champ \"%s\""
+msgstr "Échec de la suppression du champ \"%s\"."
 
 msgid "Return"
 msgstr "Retour"
@@ -107,13 +107,3 @@ msgstr "Temps restant :"
 
 msgid "Continue"
 msgstr "Continuer"
-
-#~ msgid "Fields"
-#~ msgstr "Champs"
-
-#~ msgid "All database fields in table"
-#~ msgstr "Tous les champs de la base de données dans la table"
-
-#, php-format
-#~ msgid "\"%s\" field deleted"
-#~ msgstr "Champ \"%s\" supprimé"
