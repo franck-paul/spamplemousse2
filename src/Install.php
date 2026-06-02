@@ -17,6 +17,7 @@ namespace Dotclear\Plugin\spamplemousse2;
 
 use Dotclear\App;
 use Dotclear\Helper\Process\TraitProcess;
+use Dotclear\Interface\Core\BlogInterface;
 use Exception;
 
 class Install
@@ -36,10 +37,10 @@ class Install
 
         try {
             // Init
-            $s = App::db()->structure();
+            $struct = App::db()->structure();
 
             // spam_token table creation
-            $s->spam_token
+            $struct->table(Bayesian::SPAM_TOKEN_TABLE_NAME)
                 ->field('token_id', 'varchar', 255, false, 0)
                 ->field('token_nham', 'integer', 0, false, 0)
                 ->field('token_nspam', 'integer', 0, false, 0)
@@ -50,14 +51,14 @@ class Install
             ;
 
             // we add two columns on the comment table
-            $s->comment
+            $struct->table(BlogInterface::COMMENT_TABLE_NAME)
                 ->field('comment_bayes', 'smallint', 0, false, 0)
                 ->field('comment_bayes_err', 'smallint', 0, false, 0)
             ;
 
             // schema sync
-            $si = App::db()->structure();
-            $si->synchronize($s);
+            $current_struct = App::db()->structure();
+            $current_struct->synchronize($struct);
         } catch (Exception $exception) {
             App::error()->add($exception->getMessage());
         }
