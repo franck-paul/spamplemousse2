@@ -135,7 +135,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
     {
         $spamFilter = new Bayesian();
 
-        $comment_id = isset($rs->comment_id) && is_numeric($comment_id = $rs->comment_id) ? (int) $comment_id : 0;
+        $comment_id = $rs->intField('comment_id');
 
         $rsBayes = (new SelectStatement())
             ->fields(['comment_bayes', 'comment_bayes_err'])
