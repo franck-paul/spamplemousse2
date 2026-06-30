@@ -76,11 +76,11 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
         if ($rs) {
             $rs->fetch();
 
-            $comment_author  = isset($rs->comment_author)  && is_string($comment_author = $rs->comment_author) ? $comment_author : '';
-            $comment_email   = isset($rs->comment_email)   && is_string($comment_email = $rs->comment_email) ? $comment_email : '';
-            $comment_site    = isset($rs->comment_site)    && is_string($comment_site = $rs->comment_site) ? $comment_site : '';
-            $comment_ip      = isset($rs->comment_ip)      && is_string($comment_ip = $rs->comment_ip) ? $comment_ip : '';
-            $comment_content = isset($rs->comment_content) && is_string($comment_content = $rs->comment_content) ? $comment_content : '';
+            $comment_author  = $rs->strField('comment_author');
+            $comment_email   = $rs->strField('comment_email');
+            $comment_site    = $rs->strField('comment_site');
+            $comment_ip      = $rs->strField('comment_ip');
+            $comment_content = $rs->strField('comment_content');
 
             $p = $spamFilter->getMsgProba($comment_author, $comment_email, $comment_site, $comment_ip, $comment_content);
         }

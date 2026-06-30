@@ -34,9 +34,9 @@ class Bayesian
 
     public const TRAINING_MODE_TEFT = 'TEFT';
 
-    public const TRAINING_MODE_TOE  = 'TOE';
+    public const TRAINING_MODE_TOE = 'TOE';
 
-    public const TRAINING_MODE_TUM  = 'TUM';
+    public const TRAINING_MODE_TUM = 'TUM';
 
     private readonly string $table;
 
@@ -382,10 +382,10 @@ class Bayesian
              */
             $token = [
                 'token_id'     => $t,
-                'token_nham'   => is_numeric($rs->token_nham) ? (int) $rs->token_nham : 0,
-                'token_nspam'  => is_numeric($rs->token_nspam) ? (int) $rs->token_nspam : 0,
+                'token_nham'   => $rs->intField('token_nham'),
+                'token_nspam'  => $rs->intField('token_nspam'),
                 'token_p'      => is_numeric($rs->token_p) ? (float) $rs->token_p : 0,
-                'token_mature' => (bool) $rs->token_mature,
+                'token_mature' => $rs->boolField('token_mature'),
             ];
         }
 
@@ -610,22 +610,21 @@ class Bayesian
         $rs = new MetaRecord(App::db()->con()->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . $limit . ' OFFSET ' . $offset));
 
         while ($rs->fetch()) {
-            $comment_bayes = isset($rs->comment_bayes) && is_numeric($comment_bayes = $rs->comment_bayes) ? (int) $rs->comment_bayes : 0;
+            $comment_bayes = $rs->intField('comment_bayes');
             if ($comment_bayes === 0) {
                 $spam = false;
-                if ($rs->comment_status === App::status()->comment()::JUNK) {
+                if ($rs->intField('comment_status') === App::status()->comment()::JUNK) {
                     $spam = true;
                 }
 
-                $comment_author  = isset($rs->comment_author)  && is_string($comment_author = $rs->comment_author) ? $comment_author : '';
-                $comment_email   = isset($rs->comment_email)   && is_string($comment_email = $rs->comment_email) ? $comment_email : '';
-                $comment_site    = isset($rs->comment_site)    && is_string($comment_site = $rs->comment_site) ? $comment_site : '';
-                $comment_ip      = isset($rs->comment_ip)      && is_string($comment_ip = $rs->comment_ip) ? $comment_ip : '';
-                $comment_content = isset($rs->comment_content) && is_string($comment_content = $rs->comment_content) ? $comment_content : '';
+                $comment_id      = $rs->intField('comment_id');
+                $comment_author  = $rs->strField('comment_author');
+                $comment_email   = $rs->strField('comment_email');
+                $comment_site    = $rs->strField('comment_site');
+                $comment_ip      = $rs->strField('comment_ip');
+                $comment_content = $rs->strField('comment_content');
 
                 $bayes->train($comment_author, $comment_email, $comment_site, $comment_ip, $comment_content, $spam);
-
-                $comment_id = isset($rs->comment_id) && is_numeric($comment_id = $rs->comment_id) ? (int) $comment_id : 0;
 
                 $req = 'UPDATE ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' SET comment_bayes = 1 WHERE comment_id = ' . $comment_id;
                 App::db()->con()->execute($req);
