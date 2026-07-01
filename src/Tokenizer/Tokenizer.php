@@ -187,7 +187,7 @@ abstract class Tokenizer
                     $n   = mb_strlen((string) $s);
                     $pre = $e['prefix'];
                     while ($j !== $n) {
-                        if ((mb_strpos($delim, mb_substr((string) $s, $j, 1)) !== false) || (mb_substr((string) $s, $j, 1) === ' ')) {
+                        if ((str_contains($delim, mb_substr((string) $s, $j, 1))) || (mb_substr((string) $s, $j, 1) === ' ')) {
                             $sub = mb_substr((string) $s, $i, $j - $i);
                             if ($sub !== '') {
                                 if ($type === 'token') {
@@ -209,7 +209,7 @@ abstract class Tokenizer
 
                     --$j;
                     # handling of the last word
-                    if (!((mb_strpos($delim, mb_substr((string) $s, $j, 1)) !== false) && (mb_substr((string) $s, $j, 1) === ' '))) {
+                    if (!str_contains($delim, mb_substr((string) $s, $j, 1)) || mb_substr((string) $s, $j, 1) !== ' ') {
                         $sub = mb_substr((string) $s, $i, $j - $i + 1);
                         if ($sub !== '') {
                             if ($type === 'token') {
