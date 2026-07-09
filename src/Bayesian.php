@@ -322,8 +322,8 @@ class Bayesian
             $i      = $this->sanitizeToken($i);
             $strReq = 'SELECT token_nham, token_nspam, token_p FROM ' . $this->table . ' WHERE token_id = \'' . App::db()->con()->escapeStr($i) . '\'';
             $rs     = new MetaRecord(App::db()->con()->select($strReq));
-            if (!$rs->isEmpty() && is_numeric($rs->token_p)) {
-                $p = (float) $rs->token_p;
+            if (!$rs->isEmpty() && is_numeric($rs->field('token_p'))) {
+                $p = (float) $rs->field('token_p');
             }
 
             $proba[] = $p;
@@ -363,12 +363,12 @@ class Bayesian
             $known_token = true;
             if ($retrain) {
                 # we test if it is possible to move the state of the token
-                if (!$spam && $rs->token_nspam > 0) {
+                if (!$spam && $rs->intField('token_nspam') > 0) {
                     // Not spam but already found in spam, we have a problem
                     return;
                 }
 
-                if ($spam && $rs->token_nham > 0) {
+                if ($spam && $rs->intField('token_nham') > 0) {
                     // Spam but already found in ham, we have a problem
                     return;
                 }
@@ -384,7 +384,7 @@ class Bayesian
                 'token_id'     => $t,
                 'token_nham'   => $rs->intField('token_nham'),
                 'token_nspam'  => $rs->intField('token_nspam'),
-                'token_p'      => is_numeric($rs->token_p) ? (float) $rs->token_p : 0,
+                'token_p'      => is_numeric($rs->field('token_p')) ? (float) $rs->field('token_p') : 0,
                 'token_mature' => $rs->boolField('token_mature'),
             ];
         }

@@ -151,7 +151,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
                 $spam = true;
             }
 
-            if ($rsBayes->comment_bayes == 0) {
+            if ($rsBayes->intField('comment_bayes') === 0) {
                 $spamFilter->train((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
                 (new UpdateStatement())
                     ->ref(App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME)
@@ -161,7 +161,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
                 ;
             } else {
                 $spamFilter->retrain((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
-                $err = $rsBayes->comment_bayes_err ? 0 : 1;
+                $err = $rsBayes->boolField('comment_bayes_err') ? 0 : 1;
                 (new UpdateStatement())
                     ->ref(App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME)
                     ->set('comment_bayes_err = ' . $err)
