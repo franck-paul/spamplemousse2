@@ -11,21 +11,25 @@
  * @copyright Alain Vagner
  * @copyright GPL-2.0 https://www.gnu.org/licenses/gpl-2.0.html
  */
-$this->registerModule(
-    'Spamplemousse2',
-    'A bayesian spam filter for dotclear',
-    'Alain Vagner and contributors',
-    '12.0',
-    [
-        'date'        => '2026-08-03T10:11:29+0200',
-        'requires'    => [['core', '2.39']],
-        'type'        => 'plugin',
-        'priority'    => 100,
-        'permissions' => 'My',
+declare(strict_types=1);
 
-        'details'    => 'https://open-time.net/?q=spamplemousse2',
-        'support'    => 'https://github.com/franck-paul/spamplemousse2',
-        'repository' => 'https://raw.githubusercontent.com/franck-paul/spamplemousse2/main/dcstore.xml',
-        'license'    => 'gpl2',
-    ]
-);
+if (isset($this) && is_object($this) && method_exists($this, 'registerModule') && isset($this->id) && is_string($this->id)) {
+    $this->registerModule(
+        'Spamplemousse2',
+        'A bayesian spam filter for dotclear',
+        'Alain Vagner and contributors',
+        '12.0',
+        [
+            'date'        => '2026-08-03T10:11:29+0200',
+            'requires'    => [['core', '2.39']],
+            'type'        => 'plugin',
+            'priority'    => 100,
+            'permissions' => 'My',
+
+            'details'    => 'https://open-time.net/?q=spamplemousse2',
+            'support'    => 'https://github.com/franck-paul/spamplemousse2',
+            'repository' => 'https://raw.githubusercontent.com/franck-paul/spamplemousse2/main/dcstore.xml',
+            'license'    => 'gpl2',
+        ]
+    );
+}
