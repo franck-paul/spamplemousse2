@@ -588,18 +588,14 @@ class Bayesian
     public static function feedCorpus(int $limit, int $offset): void
     {
         if (App::task()->checkContext('FRONTEND')) {
-            if (!isset(App::frontend()->spamplemousse2_bayes)) {
-                App::frontend()->spamplemousse2_bayes = new Bayesian();
-            }
+            App::frontend()->spamplemousse2_bayes ??= new Bayesian();
 
             /**
              * @var        Bayesian
              */
             $bayes = App::frontend()->spamplemousse2_bayes;
         } else {
-            if (!isset(App::backend()->spamplemousse2_bayes)) {
-                App::backend()->spamplemousse2_bayes = new Bayesian();
-            }
+            App::backend()->spamplemousse2_bayes ??= new Bayesian();
 
             /**
              * @var        Bayesian
