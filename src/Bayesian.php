@@ -30,12 +30,24 @@ use Dotclear\Plugin\spamplemousse2\Tokenizer\Url;
  */
 class Bayesian
 {
+    /**
+     * @var string SPAM_TOKEN_TABLE_NAME
+     */
     public const SPAM_TOKEN_TABLE_NAME = 'spam_token';
 
+    /**
+     * @var string TRAINING_MODE_TEFT
+     */
     public const TRAINING_MODE_TEFT = 'TEFT';
 
+    /**
+     * @var string TRAINING_MODE_TOE
+     */
     public const TRAINING_MODE_TOE = 'TOE';
 
+    /**
+     * @var string TRAINING_MODE_TUM
+     */
     public const TRAINING_MODE_TUM = 'TUM';
 
     private readonly string $table;
