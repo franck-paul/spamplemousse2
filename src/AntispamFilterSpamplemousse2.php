@@ -63,8 +63,8 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
      */
     public function getStatusMessage(string $status, ?int $comment_id): string
     {
-        $p          = 0;
-        $spamFilter = new Bayesian();
+        $p        = 0;
+        $bayesian = new Bayesian();
 
         $rs = (new SelectStatement())
             ->columns(['comment_author', 'comment_email', 'comment_site', 'comment_ip', 'comment_content'])
@@ -82,7 +82,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             $comment_ip      = $rs->strField('comment_ip');
             $comment_content = $rs->strField('comment_content');
 
-            $p = $spamFilter->getMsgProba($comment_author, $comment_email, $comment_site, $comment_ip, $comment_content);
+            $p = $bayesian->getMsgProba($comment_author, $comment_email, $comment_site, $comment_ip, $comment_content);
         }
 
         $p = round($p * 100);
@@ -109,8 +109,8 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
      */
     public function isSpam(string $type, ?string $author, ?string $email, ?string $site, ?string $ip, ?string $content, ?int $post_id, string &$status): ?bool
     {
-        $spamFilter = new Bayesian();
-        $spam       = $spamFilter->handle_new_message((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content);
+        $bayesian = new Bayesian();
+        $spam     = $bayesian->handle_new_message((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content);
         if ($spam) {
             $status = '';
         }
@@ -129,13 +129,13 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
      * @param      string        $site     The comment author site
      * @param      string        $ip       The comment author IP
      * @param      string        $content  The comment content
-     * @param      MetaRecord    $rs       The comment record
+     * @param      MetaRecord    $metaRecord       The comment record
      */
-    public function trainFilter(string $status, string $filter, string $type, ?string $author, ?string $email, ?string $site, ?string $ip, ?string $content, MetaRecord $rs): void
+    public function trainFilter(string $status, string $filter, string $type, ?string $author, ?string $email, ?string $site, ?string $ip, ?string $content, MetaRecord $metaRecord): void
     {
-        $spamFilter = new Bayesian();
+        $bayesian = new Bayesian();
 
-        $comment_id = $rs->intField('comment_id');
+        $comment_id = $metaRecord->intField('comment_id');
 
         $rsBayes = (new SelectStatement())
             ->fields(['comment_bayes', 'comment_bayes_err'])
@@ -152,7 +152,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             }
 
             if ($rsBayes->intField('comment_bayes') === 0) {
-                $spamFilter->train((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
+                $bayesian->train((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
                 (new UpdateStatement())
                     ->ref(App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME)
                     ->set('comment_bayes = 1')
@@ -160,7 +160,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
                     ->update()
                 ;
             } else {
-                $spamFilter->retrain((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
+                $bayesian->retrain((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content, $spam);
                 $err = $rsBayes->boolField('comment_bayes_err') ? 0 : 1;
                 (new UpdateStatement())
                     ->ref(App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME)
@@ -181,18 +181,18 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
      */
     public function gui(string $url): string
     {
-        $items      = [];
-        $spamFilter = new Bayesian();
-        $action     = empty($_POST['action']) ? null : $_POST['action'];
+        $items    = [];
+        $bayesian = new Bayesian();
+        $action   = empty($_POST['action']) ? null : $_POST['action'];
 
         # count number of comments
-        $nb_comm = 0;
-        $sql     = new SelectStatement();
-        $sql
-            ->column($sql->count('comment_id'))
+        $nb_comm         = 0;
+        $selectStatement = new SelectStatement();
+        $selectStatement
+            ->column($selectStatement->count('comment_id'))
             ->from(App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME)
         ;
-        $rs = $sql->select();
+        $rs = $selectStatement->select();
         if ($rs instanceof MetaRecord) {
             $nb_comm = $rs->cardinal();
         }
@@ -201,14 +201,14 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
 
         # request handling
         if ($action == 'cleanup') {
-            $spamFilter->cleanup();
+            $bayesian->cleanup();
             $items[] = (new Note())
                 ->class('message')
                 ->text(__('Cleanup successful.'));
         } elseif ($action == 'oldmsg') {
             $formparams = (new Hidden('action', 'oldmsg'))->render();
             $start      = 0;
-            $pos        = $spamFilter->getNumLearnedComments();
+            $pos        = $bayesian->getNumLearnedComments();
             $stop       = $nb_comm;
             $inc        = 10;
             $title      = __('Learning in progress...');
@@ -217,14 +217,14 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
 
             return $progress->gui('');
         } elseif ($action == 'reset') {
-            $spamFilter->resetFilter();
+            $bayesian->resetFilter();
             $items[] = (new Note())
                 ->class('message')
                 ->text(__('Reset successful.'));
         }
 
-        $errors  = $spamFilter->getNumErrorComments();
-        $learned = $spamFilter->getNumLearnedComments();
+        $errors  = $bayesian->getNumErrorComments();
+        $learned = $bayesian->getNumLearnedComments();
 
         $accuracy = [];
         if ($learned > 0) {
@@ -254,7 +254,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
                         (new Li())
                             ->text(__('Total comments:') . ' ' . $nb_comm),
                         (new Li())
-                            ->text(__('Learned tokens:') . ' ' . $spamFilter->getNumLearnedTokens()),
+                            ->text(__('Learned tokens:') . ' ' . $bayesian->getNumLearnedTokens()),
                         ... $accuracy,
                     ]),
                 (new Text('h4', __('Actions'))),
@@ -307,10 +307,10 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
      * publicAfterCommentCreate and publicAfterTrackbackCreate), and we update the
      * flag in the database.
      *
-     * @param      Cursor  $cur    The cursor on the comment
+     * @param      Cursor  $cursor    The cursor on the comment
      * @param      int     $id     The identifier of the comment
      */
-    public static function toggleLearnedFlag(Cursor $cur, int $id): void
+    public static function toggleLearnedFlag(Cursor $cursor, int $id): void
     {
         if (App::task()->checkContext('FRONTEND')) {
             $learned = App::frontend()->spamplemousse2_learned;

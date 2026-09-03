@@ -245,11 +245,11 @@ class Bayesian
      */
     private function tokenize(string $m_author, string $m_email, string $m_site, string $m_ip, string $m_content): array
     {
-        $url_t   = new Url();
-        $email_t = new Email();
-        $ip_t    = new Ip();
-        $red_t   = new Redundancies();
-        $rea_t   = new Reassembly();
+        $url          = new Url();
+        $email        = new Email();
+        $ip_t         = new Ip();
+        $redundancies = new Redundancies();
+        $reassembly   = new Reassembly();
         # headers handling
         $nom     = [];
         $mail    = [];
@@ -258,42 +258,42 @@ class Bayesian
         $contenu = [];
 
         # name
-        $elem = $url_t->create_token($this->decode($m_author), 'Hname');
+        $elem = $url->create_token($this->decode($m_author), 'Hname');
         $nom  = is_null($elem) ? [] : [$elem];
-        $nom  = $url_t->tokenize($nom);
-        $nom  = $email_t->tokenize($nom);
+        $nom  = $url->tokenize($nom);
+        $nom  = $email->tokenize($nom);
         $nom  = $ip_t->tokenize($nom);
-        $nom  = $red_t->tokenize($nom);
-        $nom  = $rea_t->tokenize($nom);
-        $nom  = $rea_t->default_tokenize_token($nom);
+        $nom  = $redundancies->tokenize($nom);
+        $nom  = $reassembly->tokenize($nom);
+        $nom  = $reassembly->default_tokenize_token($nom);
 
         # mail
-        $elem = $url_t->create_token($this->decode($m_email), 'Hmail');
+        $elem = $url->create_token($this->decode($m_email), 'Hmail');
         $mail = is_null($elem) ? [] : [$elem];
-        $mail = $email_t->tokenize($mail);
-        $mail = $email_t->default_tokenize_token($mail);
+        $mail = $email->tokenize($mail);
+        $mail = $email->default_tokenize_token($mail);
 
         # website
-        $elem = $url_t->create_token($this->decode($m_site), 'Hsite');
+        $elem = $url->create_token($this->decode($m_site), 'Hsite');
         $site = is_null($elem) ? [] : [$elem];
-        $site = $url_t->tokenize($site);
-        $site = $url_t->default_tokenize_token($site);
+        $site = $url->tokenize($site);
+        $site = $url->default_tokenize_token($site);
 
         # ip
-        $elem = $url_t->create_token($this->decode($m_ip), 'Hip');
+        $elem = $url->create_token($this->decode($m_ip), 'Hip');
         $ip   = is_null($elem) ? [] : [$elem];
         $ip   = $ip_t->tokenize($ip);
         $ip   = $ip_t->default_tokenize_token($ip);
 
         # content handling
-        $elem    = $url_t->create_token($this->decode($m_content), '');
+        $elem    = $url->create_token($this->decode($m_content), '');
         $contenu = is_null($elem) ? [] : [$elem];
-        $contenu = $url_t->tokenize($contenu);
-        $contenu = $email_t->tokenize($contenu);
+        $contenu = $url->tokenize($contenu);
+        $contenu = $email->tokenize($contenu);
         $contenu = $ip_t->tokenize($contenu);
-        $contenu = $red_t->tokenize($contenu);
-        $contenu = $rea_t->tokenize($contenu);
-        $contenu = $rea_t->default_tokenize_token($contenu);
+        $contenu = $redundancies->tokenize($contenu);
+        $contenu = $reassembly->tokenize($contenu);
+        $contenu = $reassembly->default_tokenize_token($contenu);
 
         # result
         $tok = [...$nom, ...$mail, ...$site, ...$ip, ...$contenu];
@@ -615,22 +615,22 @@ class Bayesian
             $bayes = App::backend()->spamplemousse2_bayes;
         }
 
-        $rs = new MetaRecord(App::db()->con()->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . $limit . ' OFFSET ' . $offset));
+        $metaRecord = new MetaRecord(App::db()->con()->select('SELECT comment_id, comment_author, comment_email, comment_site, comment_ip, comment_content, comment_status, comment_bayes FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' ORDER BY comment_id LIMIT ' . $limit . ' OFFSET ' . $offset));
 
-        while ($rs->fetch()) {
-            $comment_bayes = $rs->intField('comment_bayes');
+        while ($metaRecord->fetch()) {
+            $comment_bayes = $metaRecord->intField('comment_bayes');
             if ($comment_bayes === 0) {
                 $spam = false;
-                if ($rs->intField('comment_status') === App::status()->comment()::JUNK) {
+                if ($metaRecord->intField('comment_status') === App::status()->comment()::JUNK) {
                     $spam = true;
                 }
 
-                $comment_id      = $rs->intField('comment_id');
-                $comment_author  = $rs->strField('comment_author');
-                $comment_email   = $rs->strField('comment_email');
-                $comment_site    = $rs->strField('comment_site');
-                $comment_ip      = $rs->strField('comment_ip');
-                $comment_content = $rs->strField('comment_content');
+                $comment_id      = $metaRecord->intField('comment_id');
+                $comment_author  = $metaRecord->strField('comment_author');
+                $comment_email   = $metaRecord->strField('comment_email');
+                $comment_site    = $metaRecord->strField('comment_site');
+                $comment_ip      = $metaRecord->strField('comment_ip');
+                $comment_content = $metaRecord->strField('comment_content');
 
                 $bayes->train($comment_author, $comment_email, $comment_site, $comment_ip, $comment_content, $spam);
 
@@ -683,10 +683,10 @@ class Bayesian
      */
     public function getNumLearnedComments(): int
     {
-        $req = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
-        $rs  = new MetaRecord(App::db()->con()->select($req));
+        $req        = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes = 1';
+        $metaRecord = new MetaRecord(App::db()->con()->select($req));
 
-        return $rs->cardinal();
+        return $metaRecord->cardinal();
     }
 
     /**
@@ -696,10 +696,10 @@ class Bayesian
      */
     public function getNumErrorComments(): int
     {
-        $req = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
-        $rs  = new MetaRecord(App::db()->con()->select($req));
+        $req        = 'SELECT COUNT(comment_id) FROM ' . App::db()->con()->prefix() . App::blog()::COMMENT_TABLE_NAME . ' WHERE comment_bayes_err = 1';
+        $metaRecord = new MetaRecord(App::db()->con()->select($req));
 
-        return $rs->cardinal();
+        return $metaRecord->cardinal();
     }
 
     /**
@@ -709,10 +709,10 @@ class Bayesian
      */
     public function getNumLearnedTokens(): int
     {
-        $req = 'SELECT COUNT(token_id) FROM ' . $this->table;
-        $rs  = new MetaRecord(App::db()->con()->select($req));
+        $req        = 'SELECT COUNT(token_id) FROM ' . $this->table;
+        $metaRecord = new MetaRecord(App::db()->con()->select($req));
 
-        return $rs->cardinal();
+        return $metaRecord->cardinal();
     }
 
     private function sanitizeToken(string $token): string
