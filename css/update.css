@@ -1,5 +1,5 @@
 #percent {
   display: block;
   margin-block-start: 0.25em;
-  width: 15em;
+  inline-size: 15em;
 }
