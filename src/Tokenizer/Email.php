@@ -30,7 +30,6 @@ class Email extends Tokenizer
      */
     protected function match(string $str): array|int
     {
-        $result  = [];
         $matches = '';
 
         $debut_mail  = '[\d\w\/+!=#|$?%{^&}*`\'~-]';

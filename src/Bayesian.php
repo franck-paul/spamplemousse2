@@ -167,13 +167,11 @@ class Bayesian
         $tok = $this->tokenize($author, $email, $site, $ip, $content);
         # we retrain the dataset with this message until the
         #	probability of this message to be a spam changes
-        $init_spam    = 0;
-        $current_spam = 0;
-        $proba        = $this->get_probabilities($tok);
-        $p            = $this->combine($proba);
+        $init_spam = 0;
+        $proba     = $this->get_probabilities($tok);
+        $p         = $this->combine($proba);
         if ($p > 0.5) {
-            $init_spam    = 1;
-            $current_spam = 1;
+            $init_spam = 1;
         }
 
         $count = 0;
@@ -251,11 +249,6 @@ class Bayesian
         $redundancies = new Redundancies();
         $reassembly   = new Reassembly();
         # headers handling
-        $nom     = [];
-        $mail    = [];
-        $site    = [];
-        $ip      = [];
-        $contenu = [];
 
         # name
         $elem = $url->create_token($this->decode($m_author), 'Hname');
@@ -419,21 +412,6 @@ class Bayesian
             # update
             # nr of occurences in each corpuses
 
-            /**
-             * @var int $nspam
-             */
-            $nspam = 0;
-
-            /**
-             * @var int $nham
-             */
-            $nham = 0;
-
-            /**
-             * @var int $nr
-             */
-            $nr = 0;
-
             if ($spam) {
                 $nspam = $token['token_nspam'] + 1;
                 $nham  = $retrain ? $token['token_nham'] - 1 : $token['token_nham'];
@@ -543,8 +521,6 @@ class Bayesian
      */
     private function inverse_chi_square(float $x, int $v): float
     {
-        $i = 0;
-
         $m = $x / 2;
         $s = exp(-$m);
         $t = $s;

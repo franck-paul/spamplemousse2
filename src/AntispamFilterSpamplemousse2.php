@@ -197,8 +197,6 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             $nb_comm = $rs->cardinal();
         }
 
-        $learned = 0;
-
         # request handling
         if ($action == 'cleanup') {
             $bayesian->cleanup();

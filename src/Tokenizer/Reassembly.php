@@ -25,7 +25,6 @@ class Reassembly extends Tokenizer
      */
     protected function match(string $str): array|int
     {
-        $result  = [];
         $matches = '';
 
         $regexp = '([$.:*|`@_]?([\w][$.:*|`@_])+[\w]?)';
