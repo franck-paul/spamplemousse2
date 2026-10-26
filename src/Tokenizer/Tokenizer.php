@@ -109,7 +109,7 @@ abstract class Tokenizer
                             $remain = trim($matches[$n]);
                         } else {
                             # part of the string right to the found tokens
-                            $remain = trim((string) $remain);
+                            $remain = trim($remain);
                             if ($remain !== '') {
                                 if (!is_null($new_token = $this->create_token($remain, $pre, false))) {
                                     $cur[] = $new_token;
@@ -184,11 +184,11 @@ abstract class Tokenizer
                     $i   = 0; # start of mb_substring
                     $j   = 0; # end of mb_substring
                     $s   = $e['elem'];
-                    $n   = mb_strlen((string) $s);
+                    $n   = mb_strlen($s);
                     $pre = $e['prefix'];
                     while ($j !== $n) {
-                        if ((str_contains($delim, mb_substr((string) $s, $j, 1))) || (mb_substr((string) $s, $j, 1) === ' ')) {
-                            $sub = mb_substr((string) $s, $i, $j - $i);
+                        if ((str_contains($delim, mb_substr($s, $j, 1))) || (mb_substr($s, $j, 1) === ' ')) {
+                            $sub = mb_substr($s, $i, $j - $i);
                             if ($sub !== '') {
                                 if ($type === 'token') {
                                     # new prefix
@@ -209,8 +209,8 @@ abstract class Tokenizer
 
                     --$j;
                     # handling of the last word
-                    if (!str_contains($delim, mb_substr((string) $s, $j, 1)) || mb_substr((string) $s, $j, 1) !== ' ') {
-                        $sub = mb_substr((string) $s, $i, $j - $i + 1);
+                    if (!str_contains($delim, mb_substr($s, $j, 1)) || mb_substr($s, $j, 1) !== ' ') {
+                        $sub = mb_substr($s, $i, $j - $i + 1);
                         if ($sub !== '') {
                             if ($type === 'token') {
                                 # new prefix
