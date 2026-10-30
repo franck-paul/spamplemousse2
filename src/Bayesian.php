@@ -407,7 +407,7 @@ class Bayesian
             }
         }
 
-        $go = is_array($token) && (($this->training_mode !== self::TRAINING_MODE_TUM) || ($token['token_mature'] != 1) || $retrain);
+        $go = is_array($token) && (($this->training_mode !== self::TRAINING_MODE_TUM) || !$token['token_mature'] || $retrain);
         if ($known_token && $go) {
             # update
             # nr of occurences in each corpuses

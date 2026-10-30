@@ -225,7 +225,7 @@ class Progress
             $percent_xml = new XmlTag('percent');
             $percent_xml->insertNode(sprintf('%d', (int) $this->percent));
             $rsp->insertNode($percent_xml);
-            if ($this->percent != 0) {
+            if ($this->percent !== 0.0) {
                 $eta_xml = new XmlTag('eta');
                 $eta_xml->insertNode(sprintf('%d', (int) $this->eta));
                 $rsp->insertNode($eta_xml);

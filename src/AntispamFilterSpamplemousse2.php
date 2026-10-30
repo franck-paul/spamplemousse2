@@ -198,12 +198,12 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
         }
 
         # request handling
-        if ($action == 'cleanup') {
+        if ($action === 'cleanup') {
             $bayesian->cleanup();
             $items[] = (new Note())
                 ->class('message')
                 ->text(__('Cleanup successful.'));
-        } elseif ($action == 'oldmsg') {
+        } elseif ($action === 'oldmsg') {
             $formparams = (new Hidden('action', 'oldmsg'))->render();
             $start      = 0;
             $pos        = $bayesian->getNumLearnedComments();
@@ -214,7 +214,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             $progress   = new Progress($title, $url, $url, [$class, 'feedCorpus'], $start, $stop, $inc, $pos, $formparams);
 
             return $progress->gui('');
-        } elseif ($action == 'reset') {
+        } elseif ($action === 'reset') {
             $bayesian->resetFilter();
             $items[] = (new Note())
                 ->class('message')

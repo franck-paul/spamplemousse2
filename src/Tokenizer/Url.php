@@ -42,8 +42,8 @@ class Url extends Tokenizer
         $delim       = '[\'">\s\r\n]?';
 
         $regexp = $scheme . '((' . $extrem_host . $elem_host . $extrem_host . '\.' . $tld . ')|(' . $ip . '))(' . $path . ')' . $delim;
-        $res    = preg_match('/' . $regexp . '(.*)/uism', $str, $matches);
-        if ($res != 0) {
+        $res    = (bool) preg_match('/' . $regexp . '(.*)/uism', $str, $matches);
+        if ($res) {
             $result     = [];
             $url        = 'http://' . ($matches[1] ?? '') . ($matches[8] ?? '');    // @phpstan-ignore nullCoalesce.offset, nullCoalesce.offset
             $pos        = mb_strpos($str, $url);
