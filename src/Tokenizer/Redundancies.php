@@ -28,7 +28,7 @@ class Redundancies extends Tokenizer
         $matches = '';
 
         $regexp = '([\w.-]+[!?]{1})([!?]+)';
-        if (preg_match('/' . $regexp . '(.*)/uism', $str, $matches)) {
+        if ((bool) preg_match('/' . $regexp . '(.*)/uism', $str, $matches)) {
             $result   = [];
             $word     = $matches[1];
             $pos      = mb_strpos($str, $word);

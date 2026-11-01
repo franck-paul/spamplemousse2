@@ -30,14 +30,14 @@ class Reassembly extends Tokenizer
         $regexp = '([$.:*|`@_]?([\w][$.:*|`@_])+[\w]?)';
         # FIXME this regexp does not detect "v i a g r a"
         # FIXME it does not seem to work with UTF8 words
-        if (preg_match('/' . $regexp . '(.*)/uism', $str, $matches)) {
+        if ((bool) preg_match('/' . $regexp . '(.*)/uism', $str, $matches)) {
             $result   = [];
             $word_tmp = $matches[1];
             $word     = '';
             $i        = 0;
             $n        = mb_strlen($word_tmp);
             if ($n >= 4) {
-                if (!preg_match('/[\w]/uis', $word_tmp[0])) {
+                if (!(bool) preg_match('/[\w]/uis', $word_tmp[0])) {
                     $i = 1;
                 }
 

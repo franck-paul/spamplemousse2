@@ -33,7 +33,7 @@ class Ip extends Tokenizer
         $matches = '';
         $num     = '(25[0-5]|2[0-4]\d|[01]?\d\d|\d)';
         $regexp  = $num . '\.' . $num . '\.' . $num . '\.' . $num;
-        if (preg_match('/' . $regexp . '(.*)/uism', $str, $matches)) {
+        if ((bool) preg_match('/' . $regexp . '(.*)/uism', $str, $matches)) {
             $result   = [];
             $ip       = $matches[1] . '.' . $matches[2] . '.' . $matches[3] . '.' . $matches[4];
             $pos      = mb_strpos($str, $ip . $matches[5]);

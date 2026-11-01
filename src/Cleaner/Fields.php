@@ -78,9 +78,12 @@ class Fields extends CleanerParent
     public function execute(string $action, string $ns): bool
     {
         if (in_array($action, ['delete_bayes', 'delete_bayes_err'], true)) {
-            [$table, $field] = explode(PATH_SEPARATOR, $ns);
+            if (!str_contains($ns, PATH_SEPARATOR)) {
+                return false;
+            }
 
-            if ($table && $field) {
+            [$table, $field] = explode(PATH_SEPARATOR, $ns);
+            if ($table !== '' && $field !== '') {
                 $sql = 'ALTER TABLE ' . App::db()->con()->prefix() . $table . ' DROP COLUMN ' . $field;
                 App::db()->con()->execute($sql);
             }

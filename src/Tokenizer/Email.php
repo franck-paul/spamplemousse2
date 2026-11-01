@@ -39,7 +39,7 @@ class Email extends Tokenizer
         $tld         = '[A-Z]{2,6}';
 
         $regexp = '(' . $debut_mail . $elem_mail . '*)@(' . $extrem_host . $elem_host . $extrem_host . '\.' . $tld . ')';
-        if (preg_match('/' . $regexp . '(.*)/uism', $str, $matches)) {
+        if ((bool) preg_match('/' . $regexp . '(.*)/uism', $str, $matches)) {
             $result = [];
 
             $mail     = $matches[1] . '@' . $matches[2];

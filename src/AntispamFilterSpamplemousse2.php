@@ -73,7 +73,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             ->select()
         ;
 
-        if ($rs) {
+        if ($rs instanceof MetaRecord) {
             $rs->fetch();
 
             $comment_author  = $rs->strField('comment_author');
@@ -111,7 +111,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
     {
         $bayesian = new Bayesian();
         $spam     = $bayesian->handle_new_message((string) $author, (string) $email, (string) $site, (string) $ip, (string) $content);
-        if ($spam) {
+        if ($spam === true) {
             $status = '';
         }
 
@@ -143,7 +143,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             ->where('comment_id = ' . $comment_id)
             ->select();
 
-        if ($rsBayes) {
+        if ($rsBayes instanceof MetaRecord) {
             $rsBayes->fetch();
 
             $spam = false;
