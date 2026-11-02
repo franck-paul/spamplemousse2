@@ -31,6 +31,7 @@ use Dotclear\Helper\Html\Form\Submit;
 use Dotclear\Helper\Html\Form\Text;
 use Dotclear\Helper\Html\Form\Ul;
 use Dotclear\Plugin\antispam\SpamFilter;
+use Dotclear\Plugin\antispam\SpamFilters;
 
 /**
  * This class implements all the methods needed for this plugin to run as a spam filter.
@@ -147,7 +148,7 @@ class AntispamFilterSpamplemousse2 extends SpamFilter
             $rsBayes->fetch();
 
             $spam = false;
-            if ($status === 'spam') { # the current action marks the comment as spam
+            if ($status === SpamFilters::STATUS_SPAM) { # the current action marks the comment as spam
                 $spam = true;
             }
 
