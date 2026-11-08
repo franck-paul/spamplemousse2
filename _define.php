@@ -18,9 +18,9 @@ if (isset($this) && is_object($this) && method_exists($this, 'registerModule') &
         'Spamplemousse2',
         'A bayesian spam filter for dotclear',
         'Alain Vagner and contributors',
-        '12.0',
+        '13.0',
         [
-            'date'        => '2026-08-03T10:11:29+0200',
+            'date'        => '2026-11-08T10:23:52+0100',
             'requires'    => [['core', '2.40']],
             'type'        => 'plugin',
             'priority'    => 100,
